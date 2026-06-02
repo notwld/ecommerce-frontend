@@ -1,5 +1,7 @@
+import { CategorySection } from "./CategorySection";
 import { HeroChrome } from "./HeroChrome";
 import { ProductStrip } from "./ProductStrip";
+import { homepageCategories } from "./homepageCategories";
 
 const hero = {
   desktopImage:
@@ -48,6 +50,9 @@ export function HomePage() {
     <main className="min-h-screen bg-brand-background text-brand-text">
       <HeroChrome hero={hero} products={products} />
       <ProductStrip products={products} />
+      {homepageCategories.map((category) => (
+        <CategorySection key={category.title} category={category} />
+      ))}
     </main>
   );
 }
