@@ -1,0 +1,559 @@
+"use client";
+
+import Link from "next/link";
+import type { Collection, CollectionProduct } from "./collectionData";
+import { useCollectionInteractions } from "@/hooks/useCollectionInteractions";
+import type { CollectionSortOption } from "@/types/interactions";
+import { ImageWithSkeleton } from "@/components/ui/ImageWithSkeleton";
+import { MobileMenuDrawer } from "@/components/layout/MobileMenuDrawer";
+
+const sortOptions: CollectionSortOption[] = [
+  "Featured",
+  "Most relevant",
+  "Best selling",
+  "Price, low to high",
+  "Price, high to low",
+  "Date, old to new",
+  "Date, new to old",
+];
+
+export function CollectionExperience({ collection }: { collection: Collection }) {
+  const {
+    cartOpen,
+    filterOpen,
+    menuOpen,
+    products,
+    selectedSizes,
+    setCartOpen,
+    setFilterOpen,
+    setMenuOpen,
+    setSort,
+    setSortOpen,
+    sizes,
+    sort,
+    sortOpen,
+    toggleSize,
+  } = useCollectionInteractions(collection);
+
+  return (
+    <main className="min-h-screen overflow-x-hidden bg-white text-brand-text">
+      <CollectionHeader
+        activeHref={`/collections/${collection.slug}`}
+        cartProduct={products[0] ?? collection.products[0]}
+        cartRecommendations={products.slice(1, 3)}
+        cartOpen={cartOpen}
+        menuOpen={menuOpen}
+        onCloseCart={() => setCartOpen(false)}
+        onCloseMenu={() => setMenuOpen(false)}
+        onOpenCart={() => setCartOpen(true)}
+        onOpenMenu={() => setMenuOpen(true)}
+      />
+
+      <section className="grid grid-cols-2 md:grid-cols-4" aria-label="Featured collections">
+        {collection.tiles.map((tile) => (
+          <Link
+            key={tile.title}
+            href={tile.href}
+            className="group relative aspect-[480/482] cursor-pointer overflow-hidden bg-[#d9d9d9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-4"
+          >
+            <ImageWithSkeleton
+              src={tile.image}
+              alt={tile.title}
+              priority
+              sizes="(min-width: 768px) 25vw, 50vw"
+              className="object-cover object-center transition-transform duration-300 group-hover:scale-[1.025]"
+            />
+            <div className="absolute inset-0 bg-black/20" />
+            <span className="absolute inset-x-2 bottom-[34px] text-center text-[12px] font-bold uppercase tracking-[0.1em] text-white md:inset-x-4 md:text-[14px] md:tracking-[0.16em]">
+              {tile.title}
+            </span>
+          </Link>
+        ))}
+      </section>
+
+      <section className="px-5 pb-20 pt-[34px] sm:px-[60px]">
+        <div className="relative mb-[28px] grid grid-cols-2 items-start gap-4 md:grid-cols-[1fr_auto_1fr]">
+          <button
+            type="button"
+            onClick={() => setFilterOpen((value) => !value)}
+            className="order-2 flex min-h-11 cursor-pointer items-center gap-3 justify-self-start text-[14px] font-bold text-[#676869] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2 md:order-none md:mt-[18px]"
+          >
+            <FilterIcon />
+            <span>Filter</span>
+            <ChevronIcon className={filterOpen ? "rotate-180" : ""} />
+          </button>
+
+          <div className="order-1 col-span-2 text-center md:order-none md:col-span-1">
+            <h1 className="text-[23px] font-normal leading-none">{collection.title}</h1>
+            <p className="mt-4 text-[13px] text-[#676869]">
+              {collection.productCount} products
+            </p>
+          </div>
+
+          <div className="relative order-3 justify-self-end md:order-none md:mt-[18px]">
+            <button
+              type="button"
+              onClick={() => setSortOpen((value) => !value)}
+              className="flex min-h-11 cursor-pointer items-center gap-4 text-[13px] font-bold text-[#676869] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2"
+              aria-expanded={sortOpen}
+            >
+              <span>{sort}</span>
+              <ChevronIcon className={sortOpen ? "-rotate-90" : "rotate-90"} />
+            </button>
+            {sortOpen ? (
+              <div className="absolute right-0 top-[43px] z-20 w-[174px] bg-white py-4 text-left shadow-[0_8px_24px_rgba(0,0,0,0.12)]">
+                {sortOptions.map((option) => (
+                  <button
+                    key={option}
+                    type="button"
+                    onClick={() => {
+                      setSort(option);
+                      setSortOpen(false);
+                    }}
+                    className={[
+                      "block h-[35px] w-full cursor-pointer px-8 text-left text-[13px] text-[#676869] hover:bg-[#f5f5f5]",
+                      option === sort ? "font-bold" : "font-normal",
+                    ].join(" ")}
+                  >
+                    {option}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        </div>
+
+        <div className={filterOpen ? "grid gap-[30px] lg:grid-cols-[290px_1fr]" : ""}>
+          {filterOpen ? (
+            <aside className="text-[#676869]" aria-label="Collection filters">
+              <FilterPanel
+                maxPrice={Math.max(...collection.products.map((product) => product.price))}
+                selectedSizes={selectedSizes}
+                sizes={sizes}
+                onToggleSize={toggleSize}
+              />
+            </aside>
+          ) : null}
+
+          {products.length ? (
+            <div className="grid grid-cols-2 gap-x-[30px] gap-y-[54px] md:grid-cols-4">
+              {products.map((product) => (
+                <CollectionProductCard key={product.id} product={product} />
+              ))}
+            </div>
+          ) : (
+            <div className="grid min-h-[220px] place-items-center rounded border border-dashed border-[#d6d6d6] p-6 text-center text-[#676869]">
+              <p>No products match your selected filters. Try clearing a size to continue.</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      <WhatsAppButton />
+    </main>
+  );
+}
+
+function CollectionHeader({
+  activeHref,
+  cartOpen,
+  cartProduct,
+  cartRecommendations,
+  menuOpen,
+  onCloseCart,
+  onCloseMenu,
+  onOpenCart,
+  onOpenMenu,
+}: {
+  activeHref: string;
+  cartOpen: boolean;
+  cartProduct: CollectionProduct;
+  cartRecommendations: CollectionProduct[];
+  menuOpen: boolean;
+  onCloseCart: () => void;
+  onCloseMenu: () => void;
+  onOpenCart: () => void;
+  onOpenMenu: () => void;
+}) {
+  return (
+    <>
+      <div className="h-[42px] bg-brand-primary text-center text-[14px] font-bold leading-[42px] text-white">
+        <Link href="/collections/clearance-sale" className="underline-offset-2 hover:underline">
+          CLEARANCE SALE | SHOP NOW
+        </Link>
+      </div>
+      <header className="grid h-[96px] grid-cols-[1fr_auto_1fr] items-center px-5 text-brand-text sm:px-[72px]">
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            aria-label="Open menu"
+            onClick={onOpenMenu}
+            className="flex h-11 w-11 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+          >
+            <span className="relative block h-[14px] w-[20px] before:absolute before:left-0 before:top-0 before:h-[2px] before:w-full before:bg-current after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-current" />
+          </button>
+          <Link href="/search" className="hidden items-center gap-3 text-[9px] font-bold sm:flex">
+            <SearchIcon />
+            <span>Search</span>
+          </Link>
+        </div>
+
+        <Link
+          href="/"
+          aria-label="Mendeez home"
+          className="text-[25px] font-bold leading-none tracking-[0.55em] [text-indent:0.55em]"
+        >
+          MENDEEZ
+        </Link>
+
+        <nav className="flex items-center justify-end gap-7 text-[10px] font-bold leading-none">
+          <Link href="/account" className="hidden hover:underline sm:inline">
+            Account
+          </Link>
+          <button
+            type="button"
+            onClick={onOpenCart}
+            className="relative flex cursor-pointer items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2"
+            aria-label="Open cart"
+          >
+            <span className="hidden sm:inline">Cart</span>
+            <BagIcon />
+            <span className="absolute -right-3 -top-2 grid h-4 w-4 place-items-center rounded-full bg-black text-[10px] text-white">
+              1
+            </span>
+          </button>
+        </nav>
+      </header>
+
+      {menuOpen ? (
+        <MobileMenuDrawer activeHref={activeHref} onClose={onCloseMenu} />
+      ) : null}
+
+      {cartOpen ? (
+        <CartDrawer
+          product={cartProduct}
+          recommendations={cartRecommendations}
+          onClose={onCloseCart}
+        />
+      ) : null}
+    </>
+  );
+}
+
+function CartDrawer({
+  product,
+  recommendations,
+  onClose,
+}: {
+  product: CollectionProduct;
+  recommendations: CollectionProduct[];
+  onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/30">
+      <button
+        type="button"
+        aria-label="Close cart"
+        onClick={onClose}
+        className="hidden flex-1 cursor-pointer sm:block"
+      />
+      <aside
+        className="h-full w-[536px] max-w-full overflow-y-auto bg-white text-brand-text shadow-[-8px_0_24px_rgba(0,0,0,0.12)]"
+        aria-label="Shopping cart"
+      >
+        <div className="flex items-center justify-between px-[31px] pb-7 pt-[29px]">
+          <h2 className="text-[22px] font-normal leading-none">Your cart (1)</h2>
+          <button
+            type="button"
+            aria-label="Close cart"
+            onClick={onClose}
+            className="cursor-pointer text-[#676869] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2"
+          >
+            <CloseIcon />
+          </button>
+        </div>
+
+        <div className="mx-[31px] mb-8 flex h-[49px] items-center gap-3 rounded-[3px] bg-black px-5 text-[14px] font-bold text-white">
+          <ShirtIcon />
+          <span>Your cart is waiting</span>
+        </div>
+
+        <div className="grid grid-cols-[100px_1fr_auto] gap-7 px-[31px] pb-8 max-[520px]:grid-cols-[88px_1fr] max-[520px]:gap-4">
+          <Link href={product.href} className="relative h-[150px] w-[100px] cursor-pointer overflow-hidden bg-[#f0f1f3] max-[520px]:h-[132px] max-[520px]:w-[88px]">
+            <ImageWithSkeleton
+              src={product.image}
+              alt={product.name}
+              sizes="100px"
+              className="object-cover object-top"
+            />
+          </Link>
+          <div>
+            <Link href={product.href} className="cursor-pointer text-[14px] font-bold leading-5 text-[#4d4f52] hover:underline">
+              {product.name}
+            </Link>
+            <p className="mt-1 text-[11px] text-[#676869]">Size: M</p>
+            <div className="mt-10 inline-grid h-[35px] grid-cols-3 border border-[#d6d6d6] text-[#8c8c8c]">
+              <button type="button" className="w-9 cursor-pointer" aria-label="Reduce quantity">
+                -
+              </button>
+              <span className="grid w-9 place-items-center text-[13px]">1</span>
+              <button type="button" className="w-9 cursor-pointer" aria-label="Increase quantity">
+                +
+              </button>
+            </div>
+          </div>
+          <div className="text-right max-[520px]:col-span-2 max-[520px]:text-left">
+            <p className="text-[14px] font-bold leading-5 text-[#4d4f52]">{product.priceText}</p>
+            {product.originalPriceText ? (
+              <p className="text-[11px] text-[#9b9b9b] line-through">
+                {product.originalPriceText}
+              </p>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="bg-[#f7f7f8] px-[31px] pb-7 pt-[34px]">
+          <div className="mb-5 flex items-center justify-between">
+            <p className="text-[14px] text-[#4d4f52]">You may also like...</p>
+            <div className="flex gap-5 text-[#676869]">
+              <ChevronIcon className="rotate-180" />
+              <ChevronIcon />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-5">
+            {recommendations.map((item) => (
+              <Link
+                key={item.id}
+                href={item.href}
+                className="relative h-[176px] cursor-pointer overflow-hidden bg-white"
+              >
+                <ImageWithSkeleton
+                  src={item.image}
+                  alt={item.name}
+                  sizes="220px"
+                  className="object-cover object-top"
+                />
+                {item.discount ? (
+                  <span className="absolute left-3 top-3 bg-[#b33323] px-3 py-1 text-[12px] font-bold leading-none text-white">
+                    {item.discount}
+                  </span>
+                ) : null}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="px-[31px] py-7">
+          <label className="mb-2 block text-[14px] font-bold text-[#6f3fa0]">
+            giftkarte
+          </label>
+          <input
+            type="text"
+            value="GK-12345678ABCD-1234"
+            readOnly
+            aria-label="Gift card number"
+            className="h-[33px] w-full border border-[#d6d6d6] px-2 text-[13px] text-[#676869] focus:outline-none focus:ring-2 focus:ring-brand-accent"
+          />
+          <p className="mt-1 text-[10px] text-[#676869]">
+            Format: Gift Card Number-Security Code
+          </p>
+
+          <div className="mt-6 border-t border-[#e3e3e3] pt-5">
+            <div className="flex items-center justify-between text-[22px] leading-none">
+              <p>Subtotal:</p>
+              <p>{product.priceText}</p>
+            </div>
+            <p className="mt-4 text-[14px] text-[#4d4f52]">
+              Taxes, discounts and{" "}
+              <Link className="cursor-pointer underline" href="/policies/shipping-policy">
+                shipping
+              </Link>{" "}
+              calculated at checkout.
+            </p>
+            <Link href="/cart" className="mt-2 block cursor-pointer text-[14px] underline">
+              Order note
+            </Link>
+            <button
+              type="button"
+              className="mt-5 h-[46px] w-full cursor-pointer bg-[#171717] text-[13px] font-bold text-white transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2"
+            >
+              Checkout
+            </button>
+            <button
+              type="button"
+              className="mt-6 h-[46px] w-full cursor-pointer border border-[#171717] bg-white text-[13px] text-brand-text transition-colors hover:bg-[#f7f7f8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2"
+            >
+              Checkout with Rewards
+            </button>
+          </div>
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+function FilterPanel({
+  maxPrice,
+  selectedSizes,
+  sizes,
+  onToggleSize,
+}: {
+  maxPrice: number;
+  selectedSizes: string[];
+  sizes: string[];
+  onToggleSize: (size: string) => void;
+}) {
+  return (
+    <div className="max-w-[320px]">
+      <div className="mb-5 flex items-center justify-between">
+        <h2 className="text-[14px] font-bold">Size</h2>
+        <ChevronIcon className="-rotate-90" />
+      </div>
+      <div className="grid grid-cols-3 gap-3">
+        {sizes.map((size) => {
+          const active = selectedSizes.includes(size);
+          return (
+            <button
+              key={size}
+              type="button"
+              onClick={() => onToggleSize(size)}
+              className={[
+                "h-[48px] cursor-pointer border text-[13px] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2",
+                active ? "border-brand-text bg-brand-text text-white" : "border-[#d6d6d6] bg-white text-[#676869]",
+              ].join(" ")}
+            >
+              {size}
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="mt-9">
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="text-[14px] font-bold">Price</h2>
+          <ChevronIcon className="-rotate-90" />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="flex h-[48px] items-center border border-[#d6d6d6] px-4 text-[14px] text-brand-text">
+            Rs 0
+          </div>
+          <div className="flex h-[48px] items-center border border-[#d6d6d6] px-4 text-[14px] text-brand-text">
+            Rs {maxPrice}
+          </div>
+        </div>
+        <div className="relative mt-[30px] h-5">
+          <div className="absolute left-[14px] right-[14px] top-[9px] h-[3px] bg-[#232323]" />
+          <div className="absolute left-1 top-0 h-[22px] w-[22px] rounded-full border-2 border-[#232323] bg-white" />
+          <div className="absolute right-1 top-0 h-[22px] w-[22px] rounded-full border-2 border-[#232323] bg-white" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CollectionProductCard({ product }: { product: CollectionProduct }) {
+  return (
+    <article className="group cursor-pointer text-center">
+      <Link href={product.href} className="block cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-4">
+        <div className="relative aspect-[426/636] overflow-hidden bg-[#e8e8e6]">
+          <ImageWithSkeleton
+            src={product.image}
+            alt={product.name}
+            sizes="(min-width: 1024px) 25vw, 50vw"
+            className="cursor-pointer object-cover object-top transition-transform duration-200 group-hover:scale-[1.015]"
+          />
+          {product.discount ? (
+            <span className="absolute left-3 top-3 bg-[#b33323] px-3 py-1 text-[12px] font-bold leading-none text-white">
+              {product.discount}
+            </span>
+          ) : null}
+        </div>
+        <h2 className="mt-4 text-[13px] font-normal leading-5 text-[#676869]">{product.name}</h2>
+        <p className="mt-1 text-[14px] leading-none text-[#676869]">
+          <span>{product.priceText}</span>
+          {product.originalPriceText ? (
+            <span className="ml-2 text-[#9b9b9b] line-through">{product.originalPriceText}</span>
+          ) : null}
+        </p>
+        <p className="mt-4 flex justify-center gap-5 text-[10px] text-[#b2b2b2]">
+          {product.sizes.slice(0, 5).map((size) => (
+            <span key={size}>{size}</span>
+          ))}
+        </p>
+      </Link>
+    </article>
+  );
+}
+
+function SearchIcon() {
+  return (
+    <svg width="23" height="23" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="10.5" cy="10.5" r="8.5" stroke="currentColor" strokeWidth="1.7" />
+      <path d="m17 17 5 5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function BagIcon() {
+  return (
+    <svg width="21" height="24" viewBox="0 0 21 24" fill="none" aria-hidden="true">
+      <path d="M4.2 7.8h12.6l1.1 14.2H3.1L4.2 7.8Z" stroke="currentColor" strokeWidth="1.7" />
+      <path d="M7.2 7.8V5.4a3.3 3.3 0 0 1 6.6 0v2.4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M4 4l12 12M16 4 4 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function ShirtIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
+      <path
+        d="M6.2 2.5 9 4.1l2.8-1.6 3.3 2.1-1.7 3-1.5-.8v8H6.1v-8l-1.5.8-1.7-3 3.3-2.1Z"
+        stroke="currentColor"
+        strokeWidth="1.3"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function ChevronIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg className={className} width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+      <path d="m6 3.5 4.5 4.5L6 12.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function FilterIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+      <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />
+      <circle cx="7" cy="5" r="2" fill="white" stroke="currentColor" strokeWidth="1.3" />
+      <circle cx="13" cy="10" r="2" fill="white" stroke="currentColor" strokeWidth="1.3" />
+      <circle cx="6" cy="15" r="2" fill="white" stroke="currentColor" strokeWidth="1.3" />
+    </svg>
+  );
+}
+
+function WhatsAppButton() {
+  return (
+    <button
+      type="button"
+      aria-label="Open WhatsApp"
+      className="fixed bottom-6 right-7 z-30 flex h-[55px] w-[55px] items-center justify-center rounded-full bg-brand-secondary text-white shadow-[0_6px_16px_rgba(0,0,0,0.24)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary focus-visible:ring-offset-2"
+    >
+      <svg width="31" height="31" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <path d="M6.3 25.7 7.7 21A11 11 0 1 1 12 25.4l-5.7.3Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
+        <path d="M12.3 10.4c.3-.6.5-.6.9-.6h.7c.2 0 .5.1.7.5.2.5.8 2 .9 2.2.1.2.1.4 0 .6-.2.4-.4.6-.7.9-.2.2-.4.4-.2.8.2.4.9 1.5 1.9 2.4 1.3 1.2 2.4 1.6 2.8 1.8.3.1.6.1.8-.2l1.1-1.3c.3-.4.6-.3.9-.2l2.1 1c.4.2.6.3.7.5.1.2.1 1.6-.4 2.2-.5.7-1.9 1.4-3.2 1.2-1.3-.2-3.1-.8-5.2-2.1-2.6-1.6-4.3-3.9-4.9-5.1-.6-1.1-1.4-3.1-.6-4.6Z" fill="currentColor" />
+      </svg>
+    </button>
+  );
+}
