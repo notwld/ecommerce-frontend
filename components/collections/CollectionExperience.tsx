@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { Collection, CollectionProduct } from "./collectionData";
 import { useCollectionInteractions } from "@/hooks/useCollectionInteractions";
+import { useCart } from "@/components/cart/CartProvider";
 import type { CollectionSortOption } from "@/types/interactions";
 import { ImageWithSkeleton } from "@/components/ui/ImageWithSkeleton";
 import { MobileMenuDrawer } from "@/components/layout/MobileMenuDrawer";
@@ -25,12 +26,10 @@ export function CollectionExperience({
   emptyMessage?: string;
 }) {
   const {
-    cartOpen,
     filterOpen,
     menuOpen,
     products,
     selectedSizes,
-    setCartOpen,
     setFilterOpen,
     setMenuOpen,
     setSort,
@@ -41,7 +40,7 @@ export function CollectionExperience({
     toggleSize,
   } = useCollectionInteractions(collection);
 
-  const cartProduct = products[0] ?? collection.products[0];
+  const { cart, openCart } = useCart();
   const hasCatalogProducts = collection.products.length > 0;
   const showFilterEmptyState = products.length === 0 && selectedSizes.length > 0;
 
@@ -49,13 +48,10 @@ export function CollectionExperience({
     <main className="min-h-screen overflow-x-hidden bg-white text-brand-text">
       <CollectionHeader
         activeHref={`/collections/${collection.slug}`}
-        cartProduct={cartProduct}
-        cartRecommendations={products.slice(1, 3)}
-        cartOpen={cartOpen}
+        cartQuantity={cart?.totalQuantity ?? 0}
         menuOpen={menuOpen}
-        onCloseCart={() => setCartOpen(false)}
         onCloseMenu={() => setMenuOpen(false)}
-        onOpenCart={() => setCartOpen(true)}
+        onOpenCart={openCart}
         onOpenMenu={() => setMenuOpen(true)}
       />
 
@@ -232,21 +228,15 @@ function CollectionHero({
 
 function CollectionHeader({
   activeHref,
-  cartOpen,
-  cartProduct,
-  cartRecommendations,
+  cartQuantity,
   menuOpen,
-  onCloseCart,
   onCloseMenu,
   onOpenCart,
   onOpenMenu,
 }: {
   activeHref: string;
-  cartOpen: boolean;
-  cartProduct?: CollectionProduct;
-  cartRecommendations: CollectionProduct[];
+  cartQuantity: number;
   menuOpen: boolean;
-  onCloseCart: () => void;
   onCloseMenu: () => void;
   onOpenCart: () => void;
   onOpenMenu: () => void;
@@ -294,9 +284,11 @@ function CollectionHeader({
           >
             <span className="hidden sm:inline">Cart</span>
             <BagIcon />
-            <span className="absolute -right-3 -top-2 grid h-4 w-4 place-items-center rounded-full bg-black text-[10px] text-white">
-              1
-            </span>
+            {cartQuantity > 0 ? (
+              <span className="absolute -right-3 -top-2 grid h-4 w-4 place-items-center rounded-full bg-black text-[10px] text-white">
+                {cartQuantity}
+              </span>
+            ) : null}
           </button>
         </nav>
       </header>
@@ -304,200 +296,7 @@ function CollectionHeader({
       {menuOpen ? (
         <MobileMenuDrawer activeHref={activeHref} onClose={onCloseMenu} />
       ) : null}
-
-      {cartOpen ? (
-        cartProduct ? (
-          <CartDrawer
-            product={cartProduct}
-            recommendations={cartRecommendations}
-            onClose={onCloseCart}
-          />
-        ) : (
-          <EmptyCartDrawer onClose={onCloseCart} />
-        )
-      ) : null}
     </>
-  );
-}
-
-function EmptyCartDrawer({ onClose }: { onClose: () => void }) {
-  return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/30">
-      <button
-        type="button"
-        aria-label="Close cart"
-        onClick={onClose}
-        className="hidden flex-1 cursor-pointer sm:block"
-      />
-      <aside className="flex h-full w-[536px] max-w-full flex-col bg-white px-[31px] py-[29px] text-brand-text shadow-[-8px_0_24px_rgba(0,0,0,0.12)]">
-        <div className="flex items-center justify-between">
-          <h2 className="text-[22px] font-normal leading-none">Your cart</h2>
-          <button
-            type="button"
-            aria-label="Close cart"
-            onClick={onClose}
-            className="text-[#676869] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2"
-          >
-            <CloseIcon />
-          </button>
-        </div>
-        <p className="mt-10 text-[14px] text-[#676869]">
-          Your cart is empty. Browse products and add something you like.
-        </p>
-      </aside>
-    </div>
-  );
-}
-
-function CartDrawer({
-  product,
-  recommendations,
-  onClose,
-}: {
-  product: CollectionProduct;
-  recommendations: CollectionProduct[];
-  onClose: () => void;
-}) {
-  return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/30">
-      <button
-        type="button"
-        aria-label="Close cart"
-        onClick={onClose}
-        className="hidden flex-1 cursor-pointer sm:block"
-      />
-      <aside
-        className="h-full w-[536px] max-w-full overflow-y-auto bg-white text-brand-text shadow-[-8px_0_24px_rgba(0,0,0,0.12)]"
-        aria-label="Shopping cart"
-      >
-        <div className="flex items-center justify-between px-[31px] pb-7 pt-[29px]">
-          <h2 className="text-[22px] font-normal leading-none">Your cart (1)</h2>
-          <button
-            type="button"
-            aria-label="Close cart"
-            onClick={onClose}
-            className="cursor-pointer text-[#676869] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2"
-          >
-            <CloseIcon />
-          </button>
-        </div>
-
-        <div className="mx-[31px] mb-8 flex h-[49px] items-center gap-3 rounded-[3px] bg-black px-5 text-[14px] font-bold text-white">
-          <ShirtIcon />
-          <span>Your cart is waiting</span>
-        </div>
-
-        <div className="grid grid-cols-[100px_1fr_auto] gap-7 px-[31px] pb-8 max-[520px]:grid-cols-[88px_1fr] max-[520px]:gap-4">
-          <Link href={product.href} className="relative h-[150px] w-[100px] cursor-pointer overflow-hidden bg-[#f0f1f3] max-[520px]:h-[132px] max-[520px]:w-[88px]">
-            <ImageWithSkeleton
-              src={product.image}
-              alt={product.name}
-              sizes="100px"
-              className="object-cover object-top"
-            />
-          </Link>
-          <div>
-            <Link href={product.href} className="cursor-pointer text-[14px] font-bold leading-5 text-[#4d4f52] hover:underline">
-              {product.name}
-            </Link>
-            <p className="mt-1 text-[11px] text-[#676869]">Size: M</p>
-            <div className="mt-10 inline-grid h-[35px] grid-cols-3 border border-[#d6d6d6] text-[#8c8c8c]">
-              <button type="button" className="w-9 cursor-pointer" aria-label="Reduce quantity">
-                -
-              </button>
-              <span className="grid w-9 place-items-center text-[13px]">1</span>
-              <button type="button" className="w-9 cursor-pointer" aria-label="Increase quantity">
-                +
-              </button>
-            </div>
-          </div>
-          <div className="text-right max-[520px]:col-span-2 max-[520px]:text-left">
-            <p className="text-[14px] font-bold leading-5 text-[#4d4f52]">{product.priceText}</p>
-            {product.originalPriceText ? (
-              <p className="text-[11px] text-[#9b9b9b] line-through">
-                {product.originalPriceText}
-              </p>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="bg-[#f7f7f8] px-[31px] pb-7 pt-[34px]">
-          <div className="mb-5 flex items-center justify-between">
-            <p className="text-[14px] text-[#4d4f52]">You may also like...</p>
-            <div className="flex gap-5 text-[#676869]">
-              <ChevronIcon className="rotate-180" />
-              <ChevronIcon />
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-5">
-            {recommendations.map((item) => (
-              <Link
-                key={item.id}
-                href={item.href}
-                className="relative h-[176px] cursor-pointer overflow-hidden bg-white"
-              >
-                <ImageWithSkeleton
-                  src={item.image}
-                  alt={item.name}
-                  sizes="220px"
-                  className="object-cover object-top"
-                />
-                {item.discount ? (
-                  <span className="absolute left-3 top-3 bg-[#b33323] px-3 py-1 text-[12px] font-bold leading-none text-white">
-                    {item.discount}
-                  </span>
-                ) : null}
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        <div className="px-[31px] py-7">
-          <label className="mb-2 block text-[14px] font-bold text-[#6f3fa0]">
-            giftkarte
-          </label>
-          <input
-            type="text"
-            value="GK-12345678ABCD-1234"
-            readOnly
-            aria-label="Gift card number"
-            className="h-[33px] w-full border border-[#d6d6d6] px-2 text-[13px] text-[#676869] focus:outline-none focus:ring-2 focus:ring-brand-accent"
-          />
-          <p className="mt-1 text-[10px] text-[#676869]">
-            Format: Gift Card Number-Security Code
-          </p>
-
-          <div className="mt-6 border-t border-[#e3e3e3] pt-5">
-            <div className="flex items-center justify-between text-[22px] leading-none">
-              <p>Subtotal:</p>
-              <p>{product.priceText}</p>
-            </div>
-            <p className="mt-4 text-[14px] text-[#4d4f52]">
-              Taxes, discounts and{" "}
-              <Link className="cursor-pointer underline" href="/policies/shipping-policy">
-                shipping
-              </Link>{" "}
-              calculated at checkout.
-            </p>
-            <Link href="/cart" className="mt-2 block cursor-pointer text-[14px] underline">
-              Order note
-            </Link>
-            <button
-              type="button"
-              className="mt-5 h-[46px] w-full cursor-pointer bg-[#171717] text-[13px] font-bold text-white transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2"
-            >
-              Checkout
-            </button>
-            <button
-              type="button"
-              className="mt-6 h-[46px] w-full cursor-pointer border border-[#171717] bg-white text-[13px] text-brand-text transition-colors hover:bg-[#f7f7f8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2"
-            >
-              Checkout with Rewards
-            </button>
-          </div>
-        </div>
-      </aside>
-    </div>
   );
 }
 
@@ -608,27 +407,6 @@ function BagIcon() {
     <svg width="21" height="24" viewBox="0 0 21 24" fill="none" aria-hidden="true">
       <path d="M4.2 7.8h12.6l1.1 14.2H3.1L4.2 7.8Z" stroke="currentColor" strokeWidth="1.7" />
       <path d="M7.2 7.8V5.4a3.3 3.3 0 0 1 6.6 0v2.4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-      <path d="M4 4l12 12M16 4 4 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function ShirtIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
-      <path
-        d="M6.2 2.5 9 4.1l2.8-1.6 3.3 2.1-1.7 3-1.5-.8v8H6.1v-8l-1.5.8-1.7-3 3.3-2.1Z"
-        stroke="currentColor"
-        strokeWidth="1.3"
-        strokeLinejoin="round"
-      />
     </svg>
   );
 }

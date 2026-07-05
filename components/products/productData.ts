@@ -30,6 +30,7 @@ export type ProductDetail = {
   description: string[];
   details: { label: string; value: string }[];
   sizeFit: { label: string; value: string }[];
+  sizeVariants: { size: string; variantId: string; availableForSale: boolean }[];
   recommendations: ProductRecommendation[];
 };
 
@@ -171,6 +172,7 @@ export function getProduct(slug: string): ProductDetail | undefined {
       { label: "Chest", value: "39" },
       { label: "Waist", value: "30" },
     ],
+    sizeVariants: [], // ponytail: dead fallback (unused); real details come from Shopify mapper
     recommendations,
   };
 }

@@ -84,6 +84,16 @@ export function getProductSizes(product: ShopifyProduct) {
   return Array.from(new Set(variantSizes));
 }
 
+export function getSizeVariants(product: ShopifyProduct) {
+  return product.variants.edges.map(({ node }) => {
+    const size =
+      node.selectedOptions.find((option) =>
+        SIZE_OPTION_NAMES.has(option.name.toLowerCase()),
+      )?.value ?? node.title;
+    return { size, variantId: node.id, availableForSale: node.availableForSale };
+  });
+}
+
 export function getProductKeywords(product: ShopifyProduct) {
   const titleWords = product.title
     .toLowerCase()
@@ -204,6 +214,7 @@ export function mapShopifyProductToProductDetail(
     sizeFit: sizes.length
       ? [{ label: "Available sizes", value: sizes.join(", ") }]
       : [],
+    sizeVariants: getSizeVariants(product),
     recommendations,
   };
 }

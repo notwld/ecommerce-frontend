@@ -19,7 +19,7 @@ type HomePageProps = {
 export function HomePage({ featuredProducts, categories }: HomePageProps) {
   return (
     <main className="min-h-screen bg-brand-background text-brand-text">
-      <HeroChrome hero={hero} products={featuredProducts} />
+      <HeroChrome hero={hero} />
       <ProductStrip
         products={featuredProducts}
         viewAllHref="/collections/all"

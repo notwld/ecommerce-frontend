@@ -26,3 +26,16 @@ export function getShopifyConfig() {
     endpoint: `https://${shop}.myshopify.com/api/${apiVersion}/graphql.json`,
   };
 }
+
+// Admin API — only needed for order tracking. Requires a custom-app token
+// with read_orders scope in SHOPIFY_ADMIN_ACCESS_TOKEN.
+export function getShopifyAdminConfig() {
+  const shop = requireEnv("SHOPIFY_SHOP", process.env.SHOPIFY_SHOP);
+  const adminAccessToken = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
+  const apiVersion = process.env.SHOPIFY_API_VERSION ?? "2025-01";
+
+  return {
+    adminAccessToken,
+    endpoint: `https://${shop}.myshopify.com/admin/api/${apiVersion}/graphql.json`,
+  };
+}

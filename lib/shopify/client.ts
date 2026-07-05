@@ -19,6 +19,7 @@ type ShopifyGraphQlResponse<T> = {
 export async function shopifyFetch<T>(
   query: string,
   variables?: Record<string, unknown>,
+  options?: { noStore?: boolean },
 ): Promise<T> {
   const { endpoint, privateAccessToken } = getShopifyConfig();
 
@@ -29,7 +30,7 @@ export async function shopifyFetch<T>(
       "Shopify-Storefront-Private-Token": privateAccessToken,
     },
     body: JSON.stringify({ query, variables }),
-    next: { revalidate: 60 },
+    ...(options?.noStore ? { cache: "no-store" } : { next: { revalidate: 60 } }),
   });
 
   if (!response.ok) {

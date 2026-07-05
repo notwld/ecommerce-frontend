@@ -132,6 +132,72 @@ export const PRODUCT_HANDLES_QUERY = `
   }
 `;
 
+const CART_FIELDS = `
+  id
+  checkoutUrl
+  totalQuantity
+  cost { subtotalAmount { amount currencyCode } }
+  lines(first: 100) {
+    edges {
+      node {
+        id
+        quantity
+        merchandise {
+          ... on ProductVariant {
+            id
+            title
+            image { url altText }
+            price { amount currencyCode }
+            product { title handle }
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const CART_QUERY = `
+  query Cart($cartId: ID!) {
+    cart(id: $cartId) { ${CART_FIELDS} }
+  }
+`;
+
+export const CART_CREATE_MUTATION = `
+  mutation CartCreate($lines: [CartLineInput!]) {
+    cartCreate(input: { lines: $lines }) {
+      cart { ${CART_FIELDS} }
+      userErrors { field message }
+    }
+  }
+`;
+
+export const CART_LINES_ADD_MUTATION = `
+  mutation CartLinesAdd($cartId: ID!, $lines: [CartLineInput!]!) {
+    cartLinesAdd(cartId: $cartId, lines: $lines) {
+      cart { ${CART_FIELDS} }
+      userErrors { field message }
+    }
+  }
+`;
+
+export const CART_LINES_UPDATE_MUTATION = `
+  mutation CartLinesUpdate($cartId: ID!, $lines: [CartLineUpdateInput!]!) {
+    cartLinesUpdate(cartId: $cartId, lines: $lines) {
+      cart { ${CART_FIELDS} }
+      userErrors { field message }
+    }
+  }
+`;
+
+export const CART_LINES_REMOVE_MUTATION = `
+  mutation CartLinesRemove($cartId: ID!, $lineIds: [ID!]!) {
+    cartLinesRemove(cartId: $cartId, lineIds: $lineIds) {
+      cart { ${CART_FIELDS} }
+      userErrors { field message }
+    }
+  }
+`;
+
 export const COLLECTION_HANDLES_QUERY = `
   query CollectionHandles($first: Int!, $after: String) {
     collections(first: $first, after: $after) {

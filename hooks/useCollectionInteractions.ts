@@ -6,7 +6,6 @@ import type { CollectionSortOption } from "@/types/interactions";
 
 export function useCollectionInteractions(collection: Collection) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [cartOpen, setCartOpen] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
   const [sortOpen, setSortOpen] = useState(false);
   const [sort, setSort] = useState<CollectionSortOption>("Featured");
@@ -35,12 +34,10 @@ export function useCollectionInteractions(collection: Collection) {
   }
 
   return {
-    cartOpen,
     filterOpen,
     menuOpen,
     products,
     selectedSizes,
-    setCartOpen,
     setFilterOpen,
     setMenuOpen,
     setSort,
