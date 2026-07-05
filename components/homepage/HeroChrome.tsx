@@ -16,7 +16,7 @@ type HeroChromeProps = {
 
 export function HeroChrome({ hero, products }: HeroChromeProps) {
   const { cartOpen, menuOpen, setCartOpen, setMenuOpen } = useHeroChromeInteractions();
-  const cartProduct = products[1];
+  const cartProduct = products[1] ?? products[0];
 
   return (
     <section className="relative overflow-hidden bg-brand-background">
@@ -115,7 +115,8 @@ export function HeroChrome({ hero, products }: HeroChromeProps) {
       ) : null}
 
       {cartOpen ? (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/30">
+        cartProduct ? (
+          <div className="fixed inset-0 z-50 flex justify-end bg-black/30">
           <aside
             className="h-full w-[536px] max-w-full overflow-y-auto bg-white text-brand-text shadow-[-8px_0_24px_rgba(0,0,0,0.12)]"
             aria-label="Shopping cart"
@@ -242,6 +243,26 @@ export function HeroChrome({ hero, products }: HeroChromeProps) {
             </div>
           </aside>
         </div>
+        ) : (
+          <div className="fixed inset-0 z-50 flex justify-end bg-black/30">
+            <aside className="flex h-full w-[536px] max-w-full flex-col bg-white px-[31px] py-[29px] text-brand-text shadow-[-8px_0_24px_rgba(0,0,0,0.12)]">
+              <div className="flex items-center justify-between">
+                <h2 className="text-[22px] font-normal leading-none">Your cart</h2>
+                <button
+                  type="button"
+                  aria-label="Close cart"
+                  onClick={() => setCartOpen(false)}
+                  className="text-[#676869] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2"
+                >
+                  <CloseIcon />
+                </button>
+              </div>
+              <p className="mt-10 text-[14px] text-[#676869]">
+                Your cart is empty. Browse products and add something you like.
+              </p>
+            </aside>
+          </div>
+        )
       ) : null}
     </section>
   );

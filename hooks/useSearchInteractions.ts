@@ -8,6 +8,7 @@ export function useSearchInteractions(
   products: SearchProduct[],
   initialQuery = "",
   initialView: "preview" | "results" = "preview",
+  serverTotalCount?: number,
 ) {
   const [query, setQuery] = useState(initialQuery);
   const [showResults, setShowResults] = useState(initialView === "results");
@@ -49,16 +50,13 @@ export function useSearchInteractions(
   }, [hasQuery, products, selectedSizes, sort, trimmedQuery]);
 
   const previewProducts = useMemo(() => {
-    if (normalize(trimmedQuery) === "t") {
-      return ["henley-black", "textured-navy"]
-        .map((id) => products.find((product) => product.id === id))
-        .filter((product): product is SearchProduct => Boolean(product));
-    }
     return (matchedProducts.length ? matchedProducts : products).slice(0, 2);
-  }, [matchedProducts, products, trimmedQuery]);
+  }, [matchedProducts, products]);
 
-  const fullProducts = (matchedProducts.length ? matchedProducts : products).slice(0, 8);
-  const resultCount = hasQuery ? 530 : fullProducts.length;
+  const fullProducts = (matchedProducts.length ? matchedProducts : products).slice(0, 50);
+  const resultCount = hasQuery
+    ? serverTotalCount ?? matchedProducts.length
+    : fullProducts.length;
 
   function toggleSize(size: string) {
     setSelectedSizes((current) =>

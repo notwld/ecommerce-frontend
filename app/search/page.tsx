@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { SearchPage } from "@/components/search/SearchPage";
 
+export const revalidate = 60;
+
 export const metadata: Metadata = {
   title: "Search | Mendeez",
   description: "Search Mendeez products and collections.",

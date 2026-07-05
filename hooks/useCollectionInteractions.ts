@@ -67,8 +67,8 @@ function sortProducts(
     if (sort === "Best selling") return a.bestSellerRank - b.bestSellerRank;
     if (sort === "Price, low to high") return a.price - b.price;
     if (sort === "Price, high to low") return b.price - a.price;
-    if (sort === "Date, old to new") return b.dateRank - a.dateRank;
-    if (sort === "Date, new to old") return a.dateRank - b.dateRank;
+    if (sort === "Date, old to new") return a.dateRank - b.dateRank;
+    if (sort === "Date, new to old") return b.dateRank - a.dateRank;
     return 0;
   });
 }

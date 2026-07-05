@@ -27,6 +27,8 @@ export type Collection = {
   productCount: number;
   tiles: CollectionTile[];
   products: CollectionProduct[];
+  heroDesktopImage?: string;
+  heroMobileImage?: string;
 };
 
 const heroTiles: CollectionTile[] = [

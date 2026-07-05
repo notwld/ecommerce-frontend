@@ -18,7 +18,7 @@ export function CategorySection({ category }: CategorySectionProps) {
       <ProductStrip
         products={category.products}
         viewAllHref={category.href}
-        productHref={category.href}
+        emptyMessage={`No ${category.title.toLowerCase()} products are available right now. Please check back soon.`}
       />
     </>
   );

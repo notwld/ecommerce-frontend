@@ -12,6 +12,7 @@ type SearchExperienceProps = {
   initialQuery?: string;
   initialView?: "preview" | "results";
   products: SearchProduct[];
+  totalCount?: number;
 };
 
 const suggestionTerms = [
@@ -22,13 +23,12 @@ const suggestionTerms = [
   "T-Shirts Sale",
 ];
 
-const sizeOptions = ["S", "M", "L", "XL", "XXL", "30", "32", "34", "36", "38", "One Size"];
-
 export function SearchExperience({
   categories,
   initialQuery = "",
   initialView = "preview",
   products,
+  totalCount,
 }: SearchExperienceProps) {
   const {
     filterOpen,
@@ -46,7 +46,11 @@ export function SearchExperience({
     sort,
     toggleSize,
     trimmedQuery,
-  } = useSearchInteractions(products, initialQuery, initialView);
+  } = useSearchInteractions(products, initialQuery, initialView, totalCount);
+
+  const sizeOptions = Array.from(
+    new Set(products.flatMap((product) => product.sizes)),
+  ).slice(0, 12);
 
   function submitSearch(event?: FormEvent<HTMLFormElement>) {
     event?.preventDefault();
@@ -83,6 +87,7 @@ export function SearchExperience({
             products={fullProducts}
             resultCount={resultCount}
             selectedSizes={selectedSizes}
+            sizeOptions={sizeOptions}
             sort={sort}
             onSortChange={setSort}
             onToggleFilter={() => setFilterOpen((value) => !value)}
@@ -238,6 +243,7 @@ function FullResults({
   products,
   resultCount,
   selectedSizes,
+  sizeOptions,
   sort,
   onSortChange,
   onToggleFilter,
@@ -247,6 +253,7 @@ function FullResults({
   products: SearchProduct[];
   resultCount: number;
   selectedSizes: string[];
+  sizeOptions: string[];
   sort: SearchSortOption;
   onSortChange: (value: SearchSortOption) => void;
   onToggleFilter: () => void;
@@ -286,7 +293,11 @@ function FullResults({
       <div className={filterOpen ? "grid gap-[30px] lg:grid-cols-[290px_1fr]" : ""}>
         {filterOpen ? (
           <aside className="text-[#676869]" aria-label="Search filters">
-            <FilterSidebar selectedSizes={selectedSizes} onToggleSize={onToggleSize} />
+            <FilterSidebar
+              selectedSizes={selectedSizes}
+              sizeOptions={sizeOptions}
+              onToggleSize={onToggleSize}
+            />
           </aside>
         ) : null}
 
@@ -308,9 +319,11 @@ function FullResults({
 
 function FilterSidebar({
   selectedSizes,
+  sizeOptions,
   onToggleSize,
 }: {
   selectedSizes: string[];
+  sizeOptions: string[];
   onToggleSize: (size: string) => void;
 }) {
   return (

@@ -1,9 +1,20 @@
 import { notFound } from "next/navigation";
 import { ProductExperience } from "./ProductExperience";
-import { getProduct } from "./productData";
+import { fetchProductByHandle } from "@/lib/shopify/api";
+import { ShopifyApiError } from "@/lib/shopify/client";
 
-export function ProductPage({ slug }: { slug: string }) {
-  const product = getProduct(slug);
+export async function ProductPage({ slug }: { slug: string }) {
+  let product;
+
+  try {
+    product = await fetchProductByHandle(slug);
+  } catch (error) {
+    if (error instanceof ShopifyApiError) {
+      throw error;
+    }
+
+    throw new Error("We could not load this product right now. Please try again.");
+  }
 
   if (!product) {
     notFound();

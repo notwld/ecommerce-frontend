@@ -17,7 +17,13 @@ const sortOptions: CollectionSortOption[] = [
   "Date, new to old",
 ];
 
-export function CollectionExperience({ collection }: { collection: Collection }) {
+export function CollectionExperience({
+  collection,
+  emptyMessage,
+}: {
+  collection: Collection;
+  emptyMessage?: string;
+}) {
   const {
     cartOpen,
     filterOpen,
@@ -35,11 +41,15 @@ export function CollectionExperience({ collection }: { collection: Collection })
     toggleSize,
   } = useCollectionInteractions(collection);
 
+  const cartProduct = products[0] ?? collection.products[0];
+  const hasCatalogProducts = collection.products.length > 0;
+  const showFilterEmptyState = products.length === 0 && selectedSizes.length > 0;
+
   return (
     <main className="min-h-screen overflow-x-hidden bg-white text-brand-text">
       <CollectionHeader
         activeHref={`/collections/${collection.slug}`}
-        cartProduct={products[0] ?? collection.products[0]}
+        cartProduct={cartProduct}
         cartRecommendations={products.slice(1, 3)}
         cartOpen={cartOpen}
         menuOpen={menuOpen}
@@ -48,6 +58,14 @@ export function CollectionExperience({ collection }: { collection: Collection })
         onOpenCart={() => setCartOpen(true)}
         onOpenMenu={() => setMenuOpen(true)}
       />
+
+      {collection.heroDesktopImage ? (
+        <CollectionHero
+          title={collection.title}
+          desktopImage={collection.heroDesktopImage}
+          mobileImage={collection.heroMobileImage ?? collection.heroDesktopImage}
+        />
+      ) : null}
 
       <section className="grid grid-cols-2 md:grid-cols-4" aria-label="Featured collections">
         {collection.tiles.map((tile) => (
@@ -86,7 +104,7 @@ export function CollectionExperience({ collection }: { collection: Collection })
           <div className="order-1 col-span-2 text-center md:order-none md:col-span-1">
             <h1 className="text-[23px] font-normal leading-none">{collection.title}</h1>
             <p className="mt-4 text-[13px] text-[#676869]">
-              {collection.productCount} products
+              {hasCatalogProducts ? `${collection.productCount} products` : "0 products"}
             </p>
           </div>
 
@@ -127,7 +145,11 @@ export function CollectionExperience({ collection }: { collection: Collection })
           {filterOpen ? (
             <aside className="text-[#676869]" aria-label="Collection filters">
               <FilterPanel
-                maxPrice={Math.max(...collection.products.map((product) => product.price))}
+                maxPrice={
+                  collection.products.length
+                    ? Math.max(...collection.products.map((product) => product.price))
+                    : 10000
+                }
                 selectedSizes={selectedSizes}
                 sizes={sizes}
                 onToggleSize={toggleSize}
@@ -141,9 +163,16 @@ export function CollectionExperience({ collection }: { collection: Collection })
                 <CollectionProductCard key={product.id} product={product} />
               ))}
             </div>
-          ) : (
+          ) : showFilterEmptyState ? (
             <div className="grid min-h-[220px] place-items-center rounded border border-dashed border-[#d6d6d6] p-6 text-center text-[#676869]">
               <p>No products match your selected filters. Try clearing a size to continue.</p>
+            </div>
+          ) : (
+            <div className="grid min-h-[220px] place-items-center rounded border border-dashed border-[#d6d6d6] p-6 text-center text-[#676869]">
+              <p>
+                {emptyMessage ??
+                  "No products are available in this collection right now. Please check back soon."}
+              </p>
             </div>
           )}
         </div>
@@ -151,6 +180,53 @@ export function CollectionExperience({ collection }: { collection: Collection })
 
       <WhatsAppButton />
     </main>
+  );
+}
+
+function CollectionHero({
+  title,
+  desktopImage,
+  mobileImage,
+}: {
+  title: string;
+  desktopImage: string;
+  mobileImage: string;
+}) {
+  const bannerTitle = title.toUpperCase();
+
+  return (
+    <section className="bg-white" aria-label={`${title} collection`}>
+      <div className="relative hidden aspect-[1920/750] w-full md:block">
+        <ImageWithSkeleton
+          src={desktopImage}
+          alt={`${title} collection`}
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-black/15" />
+        <span className="pointer-events-none absolute inset-x-0 bottom-[12%] z-10 flex justify-center md:bottom-[14%]">
+          <span className="text-[clamp(1.75rem,7vw,3.5rem)] font-normal uppercase tracking-[0.32em] text-white">
+            {bannerTitle}
+          </span>
+        </span>
+      </div>
+      <div className="relative aspect-[680/1024] w-full md:hidden">
+        <ImageWithSkeleton
+          src={mobileImage}
+          alt={`${title} collection`}
+          priority
+          sizes="100vw"
+          className="object-cover object-center"
+        />
+        <div className="absolute inset-0 bg-black/15" />
+        <span className="pointer-events-none absolute inset-x-0 bottom-[12%] z-10 flex justify-center">
+          <span className="text-[clamp(1.75rem,7vw,3.5rem)] font-normal uppercase tracking-[0.32em] text-white">
+            {bannerTitle}
+          </span>
+        </span>
+      </div>
+    </section>
   );
 }
 
@@ -167,7 +243,7 @@ function CollectionHeader({
 }: {
   activeHref: string;
   cartOpen: boolean;
-  cartProduct: CollectionProduct;
+  cartProduct?: CollectionProduct;
   cartRecommendations: CollectionProduct[];
   menuOpen: boolean;
   onCloseCart: () => void;
@@ -230,13 +306,46 @@ function CollectionHeader({
       ) : null}
 
       {cartOpen ? (
-        <CartDrawer
-          product={cartProduct}
-          recommendations={cartRecommendations}
-          onClose={onCloseCart}
-        />
+        cartProduct ? (
+          <CartDrawer
+            product={cartProduct}
+            recommendations={cartRecommendations}
+            onClose={onCloseCart}
+          />
+        ) : (
+          <EmptyCartDrawer onClose={onCloseCart} />
+        )
       ) : null}
     </>
+  );
+}
+
+function EmptyCartDrawer({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end bg-black/30">
+      <button
+        type="button"
+        aria-label="Close cart"
+        onClick={onClose}
+        className="hidden flex-1 cursor-pointer sm:block"
+      />
+      <aside className="flex h-full w-[536px] max-w-full flex-col bg-white px-[31px] py-[29px] text-brand-text shadow-[-8px_0_24px_rgba(0,0,0,0.12)]">
+        <div className="flex items-center justify-between">
+          <h2 className="text-[22px] font-normal leading-none">Your cart</h2>
+          <button
+            type="button"
+            aria-label="Close cart"
+            onClick={onClose}
+            className="text-[#676869] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2"
+          >
+            <CloseIcon />
+          </button>
+        </div>
+        <p className="mt-10 text-[14px] text-[#676869]">
+          Your cart is empty. Browse products and add something you like.
+        </p>
+      </aside>
+    </div>
   );
 }
 

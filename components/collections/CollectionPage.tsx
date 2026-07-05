@@ -1,13 +1,33 @@
-import { notFound } from "next/navigation";
 import { CollectionExperience } from "./CollectionExperience";
-import { getCollection } from "./collectionData";
+import {
+  getCollectionShell,
+  mergeCollectionWithShell,
+} from "@/lib/shopify/collectionFallbacks";
+import {
+  fetchAllProductsCollection,
+  fetchCollectionByHandle,
+} from "@/lib/shopify/api";
 
-export function CollectionPage({ slug }: { slug: string }) {
-  const collection = getCollection(slug);
+export async function CollectionPage({ slug }: { slug: string }) {
+  const shell = getCollectionShell(slug);
+  let collection = shell;
+  let emptyMessage: string | undefined;
 
-  if (!collection) {
-    notFound();
+  try {
+    const live =
+      slug === "all"
+        ? await fetchAllProductsCollection()
+        : await fetchCollectionByHandle(slug);
+    collection = mergeCollectionWithShell(shell, live);
+
+    if (!live?.products.length) {
+      emptyMessage =
+        "No products are available in this collection right now. Please check back soon.";
+    }
+  } catch {
+    emptyMessage =
+      "We could not load products for this collection right now. Please try again in a moment.";
   }
 
-  return <CollectionExperience collection={collection} />;
+  return <CollectionExperience collection={collection} emptyMessage={emptyMessage} />;
 }

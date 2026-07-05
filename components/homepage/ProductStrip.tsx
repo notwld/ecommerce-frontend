@@ -7,18 +7,19 @@ export type HomepageProduct = {
   originalPrice?: string;
   discount?: string;
   image: string;
+  href?: string;
 };
 
 type ProductStripProps = {
   products: HomepageProduct[];
   viewAllHref?: string;
-  productHref?: string;
+  emptyMessage?: string;
 };
 
 export function ProductStrip({
   products,
   viewAllHref = "/collections/all",
-  productHref = "/collections/new-arrivals",
+  emptyMessage = "No products are available right now. Please check back soon.",
 }: ProductStripProps) {
   return (
     <section className="bg-brand-background px-4 pb-16 pt-[46px] sm:px-8 lg:px-16">
@@ -32,42 +33,48 @@ export function ProductStrip({
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-3 gap-y-8 md:grid-cols-4 md:gap-x-8">
-          {products.map((product) => (
-            <article key={product.name} className="group text-center">
-              <Link
-                href={productHref}
-                className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-4"
-              >
-                <div className="relative aspect-square overflow-hidden bg-[#f0f1f3]">
-                  <Image
-                    src={product.image}
-                    alt={product.name}
-                    fill
-                    sizes="(min-width: 1024px) 25vw, 50vw"
-                    className="object-cover object-top transition-transform duration-200 group-hover:scale-[1.015]"
-                  />
-                  {product.discount ? (
-                    <span className="absolute left-3 top-3 bg-[#b33323] px-3 py-1 text-[12px] font-bold leading-none text-white">
-                      {product.discount}
-                    </span>
-                  ) : null}
-                </div>
-                <h2 className="mt-4 text-[13px] font-normal leading-5 text-[#676869]">
-                  {product.name}
-                </h2>
-                <p className="mt-2 text-[14px] leading-none text-[#676869]">
-                  <span>{product.price}</span>
-                  {product.originalPrice ? (
-                    <span className="ml-2 text-[#9b9b9b] line-through">
-                      {product.originalPrice}
-                    </span>
-                  ) : null}
-                </p>
-              </Link>
-            </article>
-          ))}
-        </div>
+        {products.length ? (
+          <div className="grid grid-cols-2 gap-x-3 gap-y-8 md:grid-cols-4 md:gap-x-8">
+            {products.map((product) => (
+              <article key={`${product.href}-${product.name}`} className="group text-center">
+                <Link
+                  href={product.href ?? "/collections/all"}
+                  className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-4"
+                >
+                  <div className="relative aspect-square overflow-hidden bg-[#f0f1f3]">
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      sizes="(min-width: 1024px) 25vw, 50vw"
+                      className="object-cover object-top transition-transform duration-200 group-hover:scale-[1.015]"
+                    />
+                    {product.discount ? (
+                      <span className="absolute left-3 top-3 bg-[#b33323] px-3 py-1 text-[12px] font-bold leading-none text-white">
+                        {product.discount}
+                      </span>
+                    ) : null}
+                  </div>
+                  <h2 className="mt-4 text-[13px] font-normal leading-5 text-[#676869]">
+                    {product.name}
+                  </h2>
+                  <p className="mt-2 text-[14px] leading-none text-[#676869]">
+                    <span>{product.price}</span>
+                    {product.originalPrice ? (
+                      <span className="ml-2 text-[#9b9b9b] line-through">
+                        {product.originalPrice}
+                      </span>
+                    ) : null}
+                  </p>
+                </Link>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="grid min-h-[180px] place-items-center rounded border border-dashed border-[#d6d6d6] px-6 py-10 text-center text-[14px] text-[#676869]">
+            <p>{emptyMessage}</p>
+          </div>
+        )}
       </div>
     </section>
   );
