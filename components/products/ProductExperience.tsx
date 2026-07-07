@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import type { ProductDetail, ProductRecommendation } from "./productData";
@@ -229,7 +230,7 @@ function ProductHeader({
           </button>
           <Link href="/search" className="hidden items-center gap-3 text-[9px] font-bold sm:flex"><SearchIcon /><span>Search</span></Link>
         </div>
-        <Link href="/" aria-label="Mendeez home" className="text-[25px] font-bold leading-none tracking-[0.55em] [text-indent:0.55em]">MENDEEZ</Link>
+        <Link href="/" aria-label="AT Wardrobe home"><Image src="/logo-dark.webp" alt="AT Wardrobe" width={640} height={494} className="h-[44px] w-auto" /></Link>
         <nav className="flex items-center justify-end gap-7 text-[10px] font-bold leading-none">
           <Link href="/account" className="hidden hover:underline sm:inline">Account</Link>
           <button type="button" onClick={onOpenCart} className="relative flex cursor-pointer items-center gap-3" aria-label="Open cart">

@@ -23,7 +23,7 @@ export function CategoryBanner({
         <div className="relative hidden aspect-[1920/750] w-full md:block">
           <Image
             src={desktopImage}
-            alt={`Mendeez Men's ${title} Collection`}
+            alt={`AT Wardrobe Men's ${title} Collection`}
             fill
             sizes="100vw"
             className="object-cover object-center"
@@ -32,7 +32,7 @@ export function CategoryBanner({
         <div className="relative aspect-[680/1024] w-full md:hidden">
           <Image
             src={mobileImage}
-            alt={`Mendeez Men's ${title} Collection`}
+            alt={`AT Wardrobe Men's ${title} Collection`}
             fill
             sizes="100vw"
             className="object-cover object-center"

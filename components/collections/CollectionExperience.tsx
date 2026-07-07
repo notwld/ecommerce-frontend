@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import type { Collection, CollectionProduct } from "./collectionData";
 import { useCollectionInteractions } from "@/hooks/useCollectionInteractions";
@@ -264,12 +265,8 @@ function CollectionHeader({
           </Link>
         </div>
 
-        <Link
-          href="/"
-          aria-label="Mendeez home"
-          className="text-[25px] font-bold leading-none tracking-[0.55em] [text-indent:0.55em]"
-        >
-          MENDEEZ
+        <Link href="/" aria-label="AT Wardrobe home">
+          <Image src="/logo-dark.webp" alt="AT Wardrobe" width={640} height={494} className="h-[44px] w-auto" />
         </Link>
 
         <nav className="flex items-center justify-end gap-7 text-[10px] font-bold leading-none">

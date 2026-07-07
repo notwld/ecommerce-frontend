@@ -26,15 +26,15 @@ export async function generateMetadata({
     const product = await fetchProductByHandle(slug);
 
     return {
-      title: product ? `${product.name} | Mendeez` : "Product | Mendeez",
+      title: product ? `${product.name} | AT Wardrobe` : "Product | AT Wardrobe",
       description: product
-        ? `Shop ${product.name} at Mendeez.`
-        : "Shop Mendeez products.",
+        ? `Shop ${product.name} at AT Wardrobe.`
+        : "Shop AT Wardrobe products.",
     };
   } catch {
     return {
-      title: "Product | Mendeez",
-      description: "Shop Mendeez products.",
+      title: "Product | AT Wardrobe",
+      description: "Shop AT Wardrobe products.",
     };
   }
 }

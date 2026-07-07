@@ -2,20 +2,29 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { useHeroChromeInteractions } from "@/hooks/useHeroChromeInteractions";
 import { useCart } from "@/components/cart/CartProvider";
 import { MobileMenuDrawer } from "@/components/layout/MobileMenuDrawer";
 
-type HeroChromeProps = {
-  hero: {
-    desktopImage: string;
-    mobileImage: string;
-  };
-};
+const heroSlides = [
+  "/hero/slide-1.webp",
+  "/hero/slide-2.webp",
+  "/hero/slide-3.webp",
+  "/hero/slide-4.webp",
+  "/hero/slide-5.webp",
+];
 
-export function HeroChrome({ hero }: HeroChromeProps) {
+export function HeroChrome() {
   const { menuOpen, setMenuOpen } = useHeroChromeInteractions();
   const { cart, openCart } = useCart();
+  const [slide, setSlide] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => setSlide((s) => (s + 1) % heroSlides.length), 5000);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <section className="relative overflow-hidden bg-brand-background">
@@ -28,26 +37,34 @@ export function HeroChrome({ hero }: HeroChromeProps) {
         </Link>
       </div>
 
-      <div className="relative">
-        <div className="relative hidden aspect-[2400/936] w-full md:block">
-          <Image
-            src={hero.desktopImage}
-            alt="Mendeez new arrivals"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-center"
-          />
-        </div>
-        <div className="relative aspect-[680/950] w-full md:hidden">
-          <Image
-            src={hero.mobileImage}
-            alt="Mendeez new arrivals"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover object-center"
-          />
+      <div className="relative aspect-[680/950] w-full overflow-hidden md:aspect-[2400/936]">
+        <AnimatePresence>
+          <motion.div
+            key={slide}
+            className="absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.2, ease: "easeInOut" }}
+          >
+            <Image
+              src={heroSlides[slide]}
+              alt="AT Wardrobe new arrivals"
+              fill
+              priority={slide === 0}
+              sizes="100vw"
+              className="object-cover object-top"
+            />
+          </motion.div>
+        </AnimatePresence>
+
+        <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center text-center text-white [text-shadow:0_2px_24px_rgba(0,0,0,0.35)]">
+          <p className="font-sans text-[clamp(13px,1.7vw,26px)] font-semibold uppercase tracking-[0.4em]">
+            The Drop
+          </p>
+          <h1 className="font-sans text-[clamp(44px,10.5vw,150px)] font-bold italic uppercase leading-[0.85] tracking-[-0.01em]">
+            New Arrivals
+          </h1>
         </div>
 
         <header className="absolute left-0 right-0 top-0 z-20 grid h-[118px] grid-cols-[1fr_auto_1fr] items-start px-5 pt-[40px] text-white sm:px-[72px]">
@@ -70,12 +87,15 @@ export function HeroChrome({ hero }: HeroChromeProps) {
             </Link>
           </div>
 
-          <Link
-            href="/"
-            aria-label="Mendeez home"
-            className="mt-[1px] text-[25px] font-bold leading-none tracking-[0.55em] text-white [text-indent:0.55em]"
-          >
-            MENDEEZ
+          <Link href="/" aria-label="AT Wardrobe home" className="mt-[1px]">
+            <Image
+              src="/logo-light.webp"
+              alt="AT Wardrobe"
+              width={640}
+              height={494}
+              priority
+              className="h-[52px] w-auto"
+            />
           </Link>
 
           <nav className="flex items-center justify-end gap-7 text-[10px] font-bold leading-none">

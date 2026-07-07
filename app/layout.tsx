@@ -11,7 +11,7 @@ const arimo = Arimo({
 });
 
 export const metadata: Metadata = {
-  title: "Mendeez",
+  title: "AT Wardrobe",
   description: "Modern premium fashion experience",
 };
 

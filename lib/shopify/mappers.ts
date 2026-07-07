@@ -209,7 +209,7 @@ export function mapShopifyProductToProductDetail(
       : ["Product details are being updated. Please check back soon."],
     details: [
       { label: "Type", value: product.productType || "Apparel" },
-      { label: "Brand", value: product.vendor || "Mendeez" },
+      { label: "Brand", value: product.vendor || "AT Wardrobe" },
     ],
     sizeFit: sizes.length
       ? [{ label: "Available sizes", value: sizes.join(", ") }]

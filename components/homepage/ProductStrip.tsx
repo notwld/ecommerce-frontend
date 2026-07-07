@@ -35,7 +35,7 @@ export function ProductStrip({
 
         {products.length ? (
           <div className="grid grid-cols-2 gap-x-3 gap-y-8 md:grid-cols-4 md:gap-x-8">
-            {products.map((product) => (
+            {products.slice(0, 4).map((product) => (
               <article key={`${product.href}-${product.name}`} className="group text-center">
                 <Link
                   href={product.href ?? "/collections/all"}

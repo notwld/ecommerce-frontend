@@ -32,13 +32,13 @@ export async function generateMetadata({
     const collection = await fetchCollectionByHandle(slug);
 
     return {
-      title: `${(collection ?? shell).title} | Mendeez`,
-      description: `Shop ${(collection ?? shell).title} at Mendeez.`,
+      title: `${(collection ?? shell).title} | AT Wardrobe`,
+      description: `Shop ${(collection ?? shell).title} at AT Wardrobe.`,
     };
   } catch {
     return {
-      title: `${shell.title} | Mendeez`,
-      description: `Shop ${shell.title} at Mendeez.`,
+      title: `${shell.title} | AT Wardrobe`,
+      description: `Shop ${shell.title} at AT Wardrobe.`,
     };
   }
 }

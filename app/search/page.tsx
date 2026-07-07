@@ -4,8 +4,8 @@ import { SearchPage } from "@/components/search/SearchPage";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "Search | Mendeez",
-  description: "Search Mendeez products and collections.",
+  title: "Search | AT Wardrobe",
+  description: "Search AT Wardrobe products and collections.",
 };
 
 type SearchRouteProps = {

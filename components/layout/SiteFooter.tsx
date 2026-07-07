@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const infoLinks = [
@@ -65,7 +66,7 @@ export function SiteFooter() {
             </ul>
             <div className="mt-5 grid gap-2 text-[11px] text-[#2d2d2d]">
               <p>📞 +92 340 0780003</p>
-              <p>✉️ info@mendeez.com</p>
+              <p>✉️ info@atwardrobe.com</p>
             </div>
           </section>
 
@@ -108,8 +109,15 @@ export function SiteFooter() {
           </section>
         </div>
       </div>
-      <div className="border-t border-[#e4e4e4] px-8 py-7 sm:px-14 lg:px-16">
-        <p className="text-[10px] text-[#5e5e5e]">© 2026 Mendeez.</p>
+      <div className="flex flex-col items-center gap-4 border-t border-[#e4e4e4] px-8 py-7 sm:flex-row sm:justify-between sm:px-14 lg:px-16">
+        <Image
+          src="/logo-dark.webp"
+          alt="AT Wardrobe"
+          width={640}
+          height={494}
+          className="h-[44px] w-auto"
+        />
+        <p className="text-[10px] text-[#5e5e5e]">© 2026 AT Wardrobe.</p>
       </div>
     </footer>
   );

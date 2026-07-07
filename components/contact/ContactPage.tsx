@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -175,12 +176,8 @@ function ContactHeader() {
           </Link>
         </div>
 
-        <Link
-          href="/"
-          aria-label="Mendeez home"
-          className="text-[31px] indent-[0.46em] font-bold leading-none tracking-[0.46em]"
-        >
-          MENDEEZ
+        <Link href="/" aria-label="AT Wardrobe home">
+          <Image src="/logo-dark.webp" alt="AT Wardrobe" width={640} height={494} className="h-[52px] w-auto" />
         </Link>
 
         <nav className="flex items-center justify-end gap-5 text-[9px]">
