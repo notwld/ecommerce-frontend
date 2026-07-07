@@ -1,6 +1,7 @@
 import { CategorySection } from "./CategorySection";
 import { HeroChrome } from "./HeroChrome";
 import { ProductStrip } from "./ProductStrip";
+import { heroSlides } from "./heroSlides";
 import type { HomepageCategory } from "./homepageCategories";
 import type { HomepageProduct } from "./ProductStrip";
 
@@ -18,8 +19,12 @@ export function HomePage({ featuredProducts, categories }: HomePageProps) {
         viewAllHref="/collections/all"
         emptyMessage="No products are available right now. Please check back soon."
       />
-      {categories.map((category) => (
-        <CategorySection key={category.title} category={category} />
+      {categories.map((category, i) => (
+        <CategorySection
+          key={category.title}
+          category={category}
+          bannerImage={heroSlides[i % heroSlides.length]}
+        />
       ))}
     </main>
   );

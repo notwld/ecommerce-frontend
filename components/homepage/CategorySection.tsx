@@ -4,16 +4,17 @@ import type { HomepageCategory } from "./homepageCategories";
 
 type CategorySectionProps = {
   category: HomepageCategory;
+  bannerImage?: string;
 };
 
-export function CategorySection({ category }: CategorySectionProps) {
+export function CategorySection({ category, bannerImage }: CategorySectionProps) {
   return (
     <>
       <CategoryBanner
         title={category.title}
         href={category.href}
-        desktopImage={category.desktopImage}
-        mobileImage={category.mobileImage}
+        desktopImage={bannerImage ?? category.desktopImage}
+        mobileImage={bannerImage ?? category.mobileImage}
       />
       <ProductStrip
         products={category.products}

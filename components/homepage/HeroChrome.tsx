@@ -7,14 +7,7 @@ import { useEffect, useState } from "react";
 import { useHeroChromeInteractions } from "@/hooks/useHeroChromeInteractions";
 import { useCart } from "@/components/cart/CartProvider";
 import { MobileMenuDrawer } from "@/components/layout/MobileMenuDrawer";
-
-const heroSlides = [
-  "/hero/slide-1.webp",
-  "/hero/slide-2.webp",
-  "/hero/slide-3.webp",
-  "/hero/slide-4.webp",
-  "/hero/slide-5.webp",
-];
+import { heroSlides } from "./heroSlides";
 
 export function HeroChrome() {
   const { menuOpen, setMenuOpen } = useHeroChromeInteractions();

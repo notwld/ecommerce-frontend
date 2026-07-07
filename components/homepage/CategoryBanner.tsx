@@ -26,7 +26,7 @@ export function CategoryBanner({
             alt={`AT Wardrobe Men's ${title} Collection`}
             fill
             sizes="100vw"
-            className="object-cover object-center"
+            className="object-cover object-top"
           />
         </div>
         <div className="relative aspect-[680/1024] w-full md:hidden">
@@ -35,7 +35,7 @@ export function CategoryBanner({
             alt={`AT Wardrobe Men's ${title} Collection`}
             fill
             sizes="100vw"
-            className="object-cover object-center"
+            className="object-cover object-top"
           />
         </div>
         <span className="pointer-events-none absolute inset-x-0 bottom-[12%] z-10 flex justify-center md:bottom-[14%]">

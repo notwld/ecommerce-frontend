@@ -1,7 +1,6 @@
 import type { Collection, CollectionProduct } from "@/components/collections/collectionData";
 import type { HomepageProduct } from "@/components/homepage/ProductStrip";
 import type { HomepageCategory } from "@/components/homepage/homepageCategories";
-import { homepageCategories } from "@/components/homepage/homepageCategories";
 import type { ProductDetail } from "@/components/products/productData";
 import type { SearchCategory, SearchProduct } from "@/components/search/searchData";
 import { shopifyFetch } from "./client";
@@ -210,6 +209,42 @@ export async function fetchSearchCategories(): Promise<SearchCategory[]> {
   );
 }
 
+function slugifyType(type: string): string {
+  return type
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+// This store has no real Shopify collections — categories come from product types
+// (e.g. "T-Shirt"). Distinct types become the menu + homepage sections.
+export async function fetchProductTypeCategories(): Promise<{ title: string; slug: string }[]> {
+  const catalog = await fetchCatalogProducts();
+  const seen = new Map<string, string>(); // slug -> title
+  for (const product of catalog) {
+    const title = product.type?.trim();
+    if (!title || title === "Products") continue;
+    const slug = slugifyType(title);
+    if (!seen.has(slug)) seen.set(slug, title);
+  }
+  return Array.from(seen, ([slug, title]) => ({ title, slug }));
+}
+
+export async function fetchMenuCategories(): Promise<{ label: string; href: string }[]> {
+  const categories = await fetchProductTypeCategories();
+  return categories.map((category) => ({
+    label: category.title,
+    href: `/collections/${category.slug}`,
+  }));
+}
+
+export async function fetchProductsByTypeSlug(slug: string): Promise<CollectionProduct[]> {
+  const match = (await fetchProductTypeCategories()).find((c) => c.slug === slug);
+  if (!match) return [];
+  return fetchProductsByProductType(match.title);
+}
+
 export async function fetchCatalogProducts(): Promise<SearchProduct[]> {
   const products = await fetchAllProductNodes();
   return products.map((product) => mapShopifyProductToSearchProduct(product));
@@ -291,17 +326,6 @@ function mapToHomepageProduct(product: SearchProduct): HomepageProduct {
   };
 }
 
-function mapCollectionProductToHomepage(product: CollectionProduct): HomepageProduct {
-  return {
-    name: product.name,
-    price: product.priceText,
-    originalPrice: product.originalPriceText,
-    discount: product.discount,
-    image: product.image,
-    href: product.href,
-  };
-}
-
 export async function fetchHomepageData(): Promise<{
   featuredProducts: HomepageProduct[];
   categories: HomepageCategory[];
@@ -316,30 +340,24 @@ export async function fetchHomepageData(): Promise<{
 
   const allProducts = catalog.map(mapToHomepageProduct);
 
-  const categories = await Promise.all(
-    homepageCategories.map(async (category) => {
-      const handle = category.href.replace("/collections/", "");
+  // Group the catalog by product type — each type becomes a homepage section.
+  const grouped = new Map<string, { title: string; products: SearchProduct[] }>();
+  for (const product of catalog) {
+    const title = product.type?.trim();
+    if (!title || title === "Products") continue;
+    const slug = slugifyType(title);
+    const entry = grouped.get(slug) ?? { title, products: [] };
+    entry.products.push(product);
+    grouped.set(slug, entry);
+  }
 
-      try {
-        const collection = await fetchCollectionByHandle(handle);
-        if (collection?.products.length) {
-          return {
-            ...category,
-            products: collection.products
-              .slice(0, 4)
-              .map(mapCollectionProductToHomepage),
-          };
-        }
-      } catch {
-        // Keep banner imagery and show an empty product row below.
-      }
-
-      return {
-        ...category,
-        products: [],
-      };
-    }),
-  );
+  const categories: HomepageCategory[] = Array.from(grouped, ([slug, { title, products }]) => ({
+    title: title.toUpperCase(),
+    href: `/collections/${slug}`,
+    desktopImage: "", // banner comes from the shared hero pics (see HomePage)
+    mobileImage: "",
+    products: products.slice(0, 4).map(mapToHomepageProduct),
+  }));
 
   return { featuredProducts: allProducts, categories };
 }

@@ -6,6 +6,7 @@ import {
 import {
   fetchAllProductsCollection,
   fetchCollectionByHandle,
+  fetchProductsByTypeSlug,
 } from "@/lib/shopify/api";
 
 export async function CollectionPage({ slug }: { slug: string }) {
@@ -21,8 +22,14 @@ export async function CollectionPage({ slug }: { slug: string }) {
     collection = mergeCollectionWithShell(shell, live);
 
     if (!live?.products.length) {
-      emptyMessage =
-        "No products are available in this collection right now. Please check back soon.";
+      // No matching Shopify collection — fall back to products of this type.
+      const typeProducts = await fetchProductsByTypeSlug(slug);
+      if (typeProducts.length) {
+        collection = { ...collection, products: typeProducts, productCount: typeProducts.length };
+      } else {
+        emptyMessage =
+          "No products are available in this collection right now. Please check back soon.";
+      }
     }
   } catch {
     emptyMessage =
