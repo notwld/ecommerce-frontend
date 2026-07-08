@@ -4,6 +4,7 @@ import "./globals.css";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { CartDrawer } from "@/components/cart/CartDrawer";
+import { Analytics } from "@vercel/analytics/next";
 
 const arimo = Arimo({
   variable: "--font-arimo",
@@ -28,6 +29,7 @@ export default function RootLayout({
           <SiteFooter />
           <CartDrawer />
         </CartProvider>
+        <Analytics />
       </body>
     </html>
   );
