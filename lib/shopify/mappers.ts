@@ -1,7 +1,7 @@
 import type { CollectionProduct } from "@/components/collections/collectionData";
 import type { ProductDetail, ProductRecommendation } from "@/components/products/productData";
-import type { SearchCategory, SearchProduct } from "@/components/search/searchData";
-import type { ShopifyCollection, ShopifyProduct } from "./types";
+import type { SearchProduct } from "@/components/search/searchData";
+import type { ShopifyProduct } from "./types";
 
 const SIZE_OPTION_NAMES = new Set(["size", "sizes"]);
 
@@ -157,7 +157,7 @@ export function mapShopifyProductToSearchProduct(product: ShopifyProduct): Searc
           amount: String(compareAt),
           currencyCode: getMinVariantPrice(product).currencyCode,
         })
-      : formatShopifyMoney(getMinVariantPrice(product)),
+      : undefined,
     discount: getDiscountLabel(product),
     image: getProductImage(product),
     sizes: getProductSizes(product),
@@ -202,8 +202,6 @@ export function mapShopifyProductToProductDetail(
     colorImages: images.slice(0, 5),
     sizes: sizes.length ? sizes : ["One Size"],
     selectedSize: sizes[0] ?? "One Size",
-    rewardText:
-      "Earn rewards on eligible purchases. Register or sign in to our loyalty program at checkout.",
     description: descriptionParagraphs.length
       ? descriptionParagraphs
       : ["Product details are being updated. Please check back soon."],
@@ -217,22 +215,4 @@ export function mapShopifyProductToProductDetail(
     sizeVariants: getSizeVariants(product),
     recommendations,
   };
-}
-
-export function mapShopifyCollectionToSearchCategory(
-  collection: ShopifyCollection,
-): SearchCategory {
-  return {
-    title: collection.title,
-    href: `/collections/${collection.handle}`,
-    image: collection.image?.url ?? "/placeholder-collection.png",
-  };
-}
-
-export function mapShopifyCollectionsToTiles(collections: ShopifyCollection[]) {
-  return collections.slice(0, 4).map((collection) => ({
-    title: collection.title.toUpperCase(),
-    href: `/collections/${collection.handle}`,
-    image: collection.image?.url ?? "/placeholder-collection.png",
-  }));
 }

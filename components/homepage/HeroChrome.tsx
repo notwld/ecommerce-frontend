@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { useHeroChromeInteractions } from "@/hooks/useHeroChromeInteractions";
 import { useCart } from "@/components/cart/CartProvider";
 import { MobileMenuDrawer } from "@/components/layout/MobileMenuDrawer";
+import { WhatsAppFloat } from "@/components/layout/SocialIcons";
 import { heroSlides } from "./heroSlides";
 
 export function HeroChrome() {
@@ -21,15 +22,6 @@ export function HeroChrome() {
 
   return (
     <section className="relative overflow-hidden bg-brand-background">
-      <div className="h-[42px] bg-brand-primary text-center text-[14px] font-bold leading-[42px] text-white">
-        <Link
-          href="/collections/clearance-sale"
-          className="underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-brand-primary"
-        >
-          CLEARANCE SALE | SHOP NOW
-        </Link>
-      </div>
-
       <div className="relative aspect-[680/950] w-full overflow-hidden md:aspect-[2400/936]">
         <AnimatePresence>
           <motion.div
@@ -87,17 +79,17 @@ export function HeroChrome() {
               width={640}
               height={494}
               priority
-              className="h-[52px] w-auto"
+              className="h-[72px] w-auto"
             />
           </Link>
 
           <nav className="flex items-center justify-end gap-7 text-[10px] font-bold leading-none">
-            <a
-              href="/account"
+            <Link
+              href="/pages/contact"
               className="hidden hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-transparent sm:inline"
             >
-              Account
-            </a>
+              Contact Us
+            </Link>
             <button
               type="button"
               onClick={openCart}
@@ -114,13 +106,7 @@ export function HeroChrome() {
         </header>
       </div>
 
-      <button
-        type="button"
-        aria-label="Open WhatsApp"
-        className="fixed bottom-6 right-7 z-30 flex h-[55px] w-[55px] items-center justify-center rounded-full bg-brand-secondary text-white shadow-[0_6px_16px_rgba(0,0,0,0.24)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary focus-visible:ring-offset-2"
-      >
-        <WhatsAppIcon />
-      </button>
+      <WhatsAppFloat />
 
       {menuOpen ? (
         <MobileMenuDrawer
@@ -146,15 +132,6 @@ function BagIcon() {
     <svg width="21" height="24" viewBox="0 0 21 24" fill="none" aria-hidden="true">
       <path d="M4.2 7.8h12.6l1.1 14.2H3.1L4.2 7.8Z" stroke="currentColor" strokeWidth="1.7" />
       <path d="M7.2 7.8V5.4a3.3 3.3 0 0 1 6.6 0v2.4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function WhatsAppIcon() {
-  return (
-    <svg width="31" height="31" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-      <path d="M6.3 25.7 7.7 21A11 11 0 1 1 12 25.4l-5.7.3Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-      <path d="M12.3 10.4c.3-.6.5-.6.9-.6h.7c.2 0 .5.1.7.5.2.5.8 2 .9 2.2.1.2.1.4 0 .6-.2.4-.4.6-.7.9-.2.2-.4.4-.2.8.2.4.9 1.5 1.9 2.4 1.3 1.2 2.4 1.6 2.8 1.8.3.1.6.1.8-.2l1.1-1.3c.3-.4.6-.3.9-.2l2.1 1c.4.2.6.3.7.5.1.2.1 1.6-.4 2.2-.5.7-1.9 1.4-3.2 1.2-1.3-.2-3.1-.8-5.2-2.1-2.6-1.6-4.3-3.9-4.9-5.1-.6-1.1-1.4-3.1-.6-4.6Z" fill="currentColor" />
     </svg>
   );
 }

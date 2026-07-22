@@ -11,7 +11,7 @@ export type SearchProduct = {
   type: string;
   price: number;
   priceText: string;
-  originalPriceText: string;
+  originalPriceText?: string;
   discount?: string;
   image: string;
   sizes: string[];

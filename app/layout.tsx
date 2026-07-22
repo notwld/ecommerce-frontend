@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Arimo } from "next/font/google";
 import "./globals.css";
+import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { CartProvider } from "@/components/cart/CartProvider";
 import { CartDrawer } from "@/components/cart/CartDrawer";
@@ -25,6 +26,7 @@ export default function RootLayout({
     <html lang="en" className={`${arimo.variable} h-full antialiased`}>
       <body className="min-h-full bg-brand-background text-brand-text font-sans">
         <CartProvider>
+          <AnnouncementBar />
           {children}
           <SiteFooter />
           <CartDrawer />

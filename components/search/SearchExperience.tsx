@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { FormEvent } from "react";
-import type { SearchCategory, SearchProduct } from "./searchData";
+import type { SearchProduct } from "./searchData";
 import { useSearchInteractions } from "@/hooks/useSearchInteractions";
 import type { SearchSortOption } from "@/types/interactions";
 import { ImageWithSkeleton } from "@/components/ui/ImageWithSkeleton";
+import { WhatsAppFloat } from "@/components/layout/SocialIcons";
 
 type SearchExperienceProps = {
-  categories: SearchCategory[];
   initialQuery?: string;
   initialView?: "preview" | "results";
   products: SearchProduct[];
@@ -24,7 +24,6 @@ const suggestionTerms = [
 ];
 
 export function SearchExperience({
-  categories,
   initialQuery = "",
   initialView = "preview",
   products,
@@ -51,6 +50,8 @@ export function SearchExperience({
   const sizeOptions = Array.from(
     new Set(products.flatMap((product) => product.sizes)),
   ).slice(0, 12);
+
+  const suggestedProducts = products.slice(0, 4);
 
   function submitSearch(event?: FormEvent<HTMLFormElement>) {
     event?.preventDefault();
@@ -80,7 +81,7 @@ export function SearchExperience({
         </div>
 
         {!hasQuery ? (
-          <DefaultDiscovery categories={categories} />
+          <DefaultDiscovery products={suggestedProducts} />
         ) : showResults ? (
           <FullResults
             filterOpen={filterOpen}
@@ -102,7 +103,7 @@ export function SearchExperience({
         )}
       </div>
 
-      <WhatsAppButton />
+      <WhatsAppFloat />
     </section>
   );
 }
@@ -155,32 +156,23 @@ function SearchHeader({
   );
 }
 
-function DefaultDiscovery({ categories }: { categories: SearchCategory[] }) {
+function DefaultDiscovery({ products }: { products: SearchProduct[] }) {
   return (
     <div className="mx-auto max-w-[1088px] px-5 pb-20 pt-[62px]">
       <h1 className="text-center text-[24px] font-normal leading-none">
         You may also like...
       </h1>
-      <div className="mt-[42px] grid grid-cols-2 gap-x-[30px] gap-y-[30px] md:grid-cols-4">
-        {categories.map((category) => (
-          <Link
-            key={category.title}
-            href={category.href}
-            className="group relative aspect-[248/369] overflow-hidden bg-[#e8e8e8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-4"
-          >
-            <ImageWithSkeleton
-              src={category.image}
-              alt={category.title}
-              sizes="(min-width: 768px) 248px, 50vw"
-              className="object-cover object-top transition-transform duration-200 group-hover:scale-[1.02]"
-            />
-            <div className="absolute inset-0 bg-black/20" />
-            <span className="absolute inset-x-3 top-1/2 -translate-y-1/2 text-center text-[20px] font-bold leading-tight text-white">
-              {category.title}
-            </span>
-          </Link>
-        ))}
-      </div>
+      {products.length ? (
+        <div className="mt-[42px] grid grid-cols-2 gap-x-[30px] gap-y-[30px] md:grid-cols-4">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      ) : (
+        <p className="mt-[42px] text-center text-[13px] text-[#676869]">
+          No products are available right now. Please check back soon.
+        </p>
+      )}
     </div>
   );
 }
@@ -410,9 +402,12 @@ function ProductCard({ product, compact = false }: { product: SearchProduct; com
         </h2>
         <p className="mt-1 text-[14px] leading-none text-[#676869]">
           <span>{product.priceText}</span>
-          <span className="ml-2 text-[#9b9b9b] line-through">
-            {product.originalPriceText}
-          </span>
+          {product.originalPriceText &&
+          product.originalPriceText !== product.priceText ? (
+            <span className="ml-2 text-[#9b9b9b] line-through">
+              {product.originalPriceText}
+            </span>
+          ) : null}
         </p>
         {!compact ? (
           <p className="mt-4 flex justify-center gap-5 text-[10px] text-[#b2b2b2]">
@@ -459,20 +454,5 @@ function ChevronIcon({ className = "" }: { className?: string }) {
     <svg className={className} width="15" height="15" viewBox="0 0 16 16" fill="none" aria-hidden="true">
       <path d="m5.5 3.5 4.5 4.5-4.5 4.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
-  );
-}
-
-function WhatsAppButton() {
-  return (
-    <button
-      type="button"
-      aria-label="Open WhatsApp"
-      className="fixed bottom-6 right-7 z-30 flex h-[55px] w-[55px] items-center justify-center rounded-full bg-brand-secondary text-white shadow-[0_6px_16px_rgba(0,0,0,0.24)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary focus-visible:ring-offset-2"
-    >
-      <svg width="31" height="31" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <path d="M6.3 25.7 7.7 21A11 11 0 1 1 12 25.4l-5.7.3Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-        <path d="M12.3 10.4c.3-.6.5-.6.9-.6h.7c.2 0 .5.1.7.5.2.5.8 2 .9 2.2.1.2.1.4 0 .6-.2.4-.4.6-.7.9-.2.2-.4.4-.2.8.2.4.9 1.5 1.9 2.4 1.3 1.2 2.4 1.6 2.8 1.8.3.1.6.1.8-.2l1.1-1.3c.3-.4.6-.3.9-.2l2.1 1c.4.2.6.3.7.5.1.2.1 1.6-.4 2.2-.5.7-1.9 1.4-3.2 1.2-1.3-.2-3.1-.8-5.2-2.1-2.6-1.6-4.3-3.9-4.9-5.1-.6-1.1-1.4-3.1-.6-4.6Z" fill="currentColor" />
-      </svg>
-    </button>
   );
 }

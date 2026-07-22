@@ -26,7 +26,6 @@ export type ProductDetail = {
   colorImages: string[];
   sizes: string[];
   selectedSize: string;
-  rewardText: string;
   description: string[];
   details: { label: string; value: string }[];
   sizeFit: { label: string; value: string }[];
@@ -155,8 +154,6 @@ export function getProduct(slug: string): ProductDetail | undefined {
     colorImages,
     sizes: source.sizes.length ? source.sizes : ["S", "M", "L", "XL", "XXL"],
     selectedSize: source.sizes[0] ?? "S",
-    rewardText:
-      "Earn Rs. 37 - Rs. 62 in rewards. Register or sign in to our loyalty program at checkout.",
     description: [
       "Our Basic Crew Neck T-shirt is crafted with care and attention. This T-shirt features a lightweight, breathable, soft cotton jersey fabric that makes it perfect for summer.",
       "With its classic crewneck design and versatile style, our T-shirt is perfect for any occasion.",

@@ -1,35 +1,30 @@
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
+import {
+  SITE_EMAIL,
+  SITE_INSTAGRAM_HANDLE,
+  SITE_INSTAGRAM_URL,
+  SITE_PHONE_DISPLAY,
+  SITE_WHATSAPP_URL,
+} from "@/lib/site-contact";
+import { socialProfiles, WhatsAppGlyph } from "@/components/layout/SocialIcons";
 
 const infoLinks = [
-  { label: "Become Our Distributor", href: "/pages/become-our-distributor" },
   { label: "Terms & Conditions", href: "/policies/terms-of-service" },
-  { label: "Shipping Policy", href: "/policies/shipping-policy" },
   { label: "Privacy Policy", href: "/policies/privacy-policy" },
-  { label: "Return Policy", href: "/policies/refund-policy" },
-  { label: "Blogs", href: "/blogs/news" },
+  { label: "Return & Exchange Policy", href: "/policies/refund-policy" },
 ];
 
 const customerCareLinks = [
-  { label: "Loyalty Program", href: "/pages/rewards" },
   { label: "Complaint Form", href: "/pages/complaint-form" },
   { label: "Contact Us", href: "/pages/contact" },
-  { label: "Careers", href: "/pages/careers" },
-  { label: "FAQs", href: "/pages/faqs" },
-];
-
-const socialLinks = [
-  { label: "Facebook", href: "https://www.facebook.com/mendeez" },
-  { label: "Instagram", href: "https://www.instagram.com/mendeez.pk" },
-  { label: "YouTube", href: "https://www.youtube.com" },
-  { label: "TikTok", href: "https://www.tiktok.com" },
 ];
 
 export function SiteFooter() {
   return (
     <footer className="bg-[#f1f1f1] text-[#222]">
       <div className="mx-auto max-w-[1400px] px-8 pb-14 pt-16 sm:px-14 lg:px-16">
-        <div className="grid gap-12 md:grid-cols-3 md:gap-10">
+        <div className="grid gap-12 md:grid-cols-2 md:gap-10">
           <section>
             <h2 className="text-[13px] font-bold uppercase tracking-wide">
               Information
@@ -64,45 +59,55 @@ export function SiteFooter() {
                 </li>
               ))}
             </ul>
-            <div className="mt-5 grid gap-2 text-[11px] text-[#2d2d2d]">
-              <p>📞 +92 340 0780003</p>
-              <p>✉️ info@atwardrobe.com</p>
-            </div>
-          </section>
 
-          <section>
-            <h2 className="text-[13px] font-bold uppercase tracking-wide">
-              Join Newsletter For Flat 10% Off
-            </h2>
-            <form className="mt-6 flex max-w-[330px] flex-wrap items-center gap-3">
-              <label htmlFor="footer-email" className="sr-only">
-                Your email
-              </label>
-              <input
-                id="footer-email"
-                type="email"
-                placeholder="Your email"
-                className="h-[34px] flex-1 border border-[#d3d3d3] bg-white px-3 text-[11px] text-[#2f2f2f] placeholder:text-[#8b8b8b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
-              />
-              <button
-                type="button"
-                className="h-[32px] min-w-[84px] bg-[#222] px-4 text-[10px] text-white transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2 focus-visible:ring-offset-[#f1f1f1]"
+            <div className="mt-6 grid gap-3 text-[11px] text-[#2d2d2d]">
+              <a
+                href={SITE_WHATSAPP_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 transition-colors hover:text-black hover:underline"
               >
-                Subscribe
-              </button>
-            </form>
+                <span className="inline-flex h-4 w-4 items-center justify-center text-[#25D366]">
+                  <WhatsAppGlyph size={14} />
+                </span>
+                <span>{SITE_PHONE_DISPLAY}</span>
+                <span className="text-[#676869]">(WhatsApp)</span>
+              </a>
+              <a
+                href={SITE_INSTAGRAM_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 transition-colors hover:text-black hover:underline"
+              >
+                <span className="inline-flex h-4 w-4 items-center justify-center">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" strokeWidth="1.8" />
+                    <circle cx="12" cy="12" r="4.2" stroke="currentColor" strokeWidth="1.8" />
+                    <circle cx="17.2" cy="6.8" r="1.2" fill="currentColor" />
+                  </svg>
+                </span>
+                <span>{SITE_INSTAGRAM_HANDLE}</span>
+              </a>
+              <a
+                href={`mailto:${SITE_EMAIL}`}
+                className="inline-flex items-center gap-2 transition-colors hover:text-black hover:underline"
+              >
+                <span aria-hidden="true">✉️</span>
+                <span>{SITE_EMAIL}</span>
+              </a>
+            </div>
 
             <div className="mt-6 flex items-center gap-3 text-[#222]">
-              {socialLinks.map((item) => (
+              {socialProfiles.map(({ label, href, Icon }) => (
                 <a
-                  key={item.label}
-                  href={item.href}
+                  key={label}
+                  href={href}
                   target="_blank"
                   rel="noreferrer"
-                  aria-label={item.label}
-                  className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-transparent text-[#222] transition-colors hover:border-[#c7c7c7] hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+                  aria-label={label}
+                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#d0d0d0] text-[#222] transition-colors hover:border-[#222] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
                 >
-                  <SocialDot />
+                  <Icon size={15} />
                 </a>
               ))}
             </div>
@@ -120,13 +125,5 @@ export function SiteFooter() {
         <p className="text-[10px] text-[#5e5e5e]">© 2026 AT Wardrobe.</p>
       </div>
     </footer>
-  );
-}
-
-function SocialDot() {
-  return (
-    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true">
-      <circle cx="5" cy="5" r="4" fill="currentColor" />
-    </svg>
   );
 }

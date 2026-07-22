@@ -2,12 +2,9 @@ import type { Collection, CollectionProduct } from "@/components/collections/col
 import type { HomepageProduct } from "@/components/homepage/ProductStrip";
 import type { HomepageCategory } from "@/components/homepage/homepageCategories";
 import type { ProductDetail } from "@/components/products/productData";
-import type { SearchCategory, SearchProduct } from "@/components/search/searchData";
+import type { SearchProduct } from "@/components/search/searchData";
 import { shopifyFetch } from "./client";
-import { defaultCollectionTiles } from "./collectionFallbacks";
 import {
-  mapShopifyCollectionToSearchCategory,
-  mapShopifyCollectionsToTiles,
   mapShopifyProductToCollectionProduct,
   mapShopifyProductToProductDetail,
   mapShopifyProductToSearchProduct,
@@ -15,7 +12,6 @@ import {
 import {
   COLLECTION_BY_HANDLE_QUERY,
   COLLECTION_HANDLES_QUERY,
-  COLLECTIONS_QUERY,
   PRODUCT_BY_HANDLE_QUERY,
   PRODUCT_HANDLES_QUERY,
   PRODUCTS_QUERY,
@@ -32,12 +28,6 @@ type ProductByHandleResponse = {
 
 type CollectionByHandleResponse = {
   collection: ShopifyCollection | null;
-};
-
-type CollectionsResponse = {
-  collections: {
-    edges: Array<{ node: ShopifyCollection }>;
-  };
 };
 
 type ProductsResponse = {
@@ -166,15 +156,13 @@ export async function fetchCollectionByHandle(handle: string): Promise<Collectio
     return fetchAllProductsCollection();
   }
 
-  const [collectionData, allCollectionsData] = await Promise.all([
-    shopifyFetch<CollectionByHandleResponse>(COLLECTION_BY_HANDLE_QUERY, {
+  const collectionData = await shopifyFetch<CollectionByHandleResponse>(
+    COLLECTION_BY_HANDLE_QUERY,
+    {
       handle,
       first: MAX_PRODUCTS,
-    }),
-    shopifyFetch<CollectionsResponse>(COLLECTIONS_QUERY, {
-      first: MAX_COLLECTIONS,
-    }),
-  ]);
+    },
+  );
 
   const collection = collectionData.collection;
   if (!collection) return null;
@@ -184,29 +172,14 @@ export async function fetchCollectionByHandle(handle: string): Promise<Collectio
       mapShopifyProductToCollectionProduct(edge.node, index),
     ) ?? [];
 
-  const otherCollections = allCollectionsData.collections.edges
-    .map((edge) => edge.node)
-    .filter((item) => item.handle !== handle);
-
   return {
     slug: collection.handle,
     title: collection.title,
     productCount: products.length,
-    tiles: mapShopifyCollectionsToTiles(otherCollections),
     products,
     heroDesktopImage: collection.image?.url ?? undefined,
     heroMobileImage: collection.image?.url ?? undefined,
   };
-}
-
-export async function fetchSearchCategories(): Promise<SearchCategory[]> {
-  const data = await shopifyFetch<CollectionsResponse>(COLLECTIONS_QUERY, {
-    first: MAX_COLLECTIONS,
-  });
-
-  return data.collections.edges.map((edge) =>
-    mapShopifyCollectionToSearchCategory(edge.node),
-  );
 }
 
 function slugifyType(type: string): string {
@@ -307,7 +280,6 @@ export async function fetchAllProductsCollection(): Promise<Collection> {
     slug: "all",
     title: "All Products",
     productCount: products.length,
-    tiles: defaultCollectionTiles,
     products,
   };
 }

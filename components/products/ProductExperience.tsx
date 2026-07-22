@@ -2,14 +2,27 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ProductDetail, ProductRecommendation } from "./productData";
 import { useProductInteractions } from "@/hooks/useProductInteractions";
 import { useCart } from "@/components/cart/CartProvider";
 import { ImageWithSkeleton } from "@/components/ui/ImageWithSkeleton";
 import { MobileMenuDrawer } from "@/components/layout/MobileMenuDrawer";
+import { WhatsAppFloat } from "@/components/layout/SocialIcons";
+import { ProductReviews } from "@/components/products/ProductReviews";
+import type { ProductReview, ReviewSummary } from "@/app/actions/reviews";
 
-export function ProductExperience({ product }: { product: ProductDetail }) {
+type ProductExperienceProps = {
+  product: ProductDetail;
+  reviews: ProductReview[];
+  reviewSummary: ReviewSummary;
+};
+
+export function ProductExperience({
+  product,
+  reviews,
+  reviewSummary,
+}: ProductExperienceProps) {
   const {
     activeImage,
     hasMultipleImages,
@@ -27,6 +40,7 @@ export function ProductExperience({ product }: { product: ProductDetail }) {
   const { cart, add, openCart } = useCart();
   const [adding, setAdding] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
+  const [sizeChartOpen, setSizeChartOpen] = useState(false);
 
   const selectedVariant =
     product.sizeVariants.find((variant) => variant.size === selectedSize) ??
@@ -95,14 +109,18 @@ export function ProductExperience({ product }: { product: ProductDetail }) {
               <h1 className="text-[28px] font-normal leading-tight">{product.name}</h1>
               <p className="mt-7 text-[20px] leading-none">
                 <span className="text-[#ef402f]">{product.priceText}</span>
-                {product.originalPriceText ? (
+                {product.originalPriceText &&
+                product.originalPriceText !== product.priceText ? (
                   <span className="ml-4 text-[#676869] line-through">{product.originalPriceText}</span>
                 ) : null}
               </p>
             </div>
             <div className="flex items-center gap-2 pt-12 text-[12px] text-[#676869] xl:pt-[54px]">
-              <Stars />
-              <span>{product.reviewCount} review</span>
+              <Stars rating={Math.round(reviewSummary.averageRating)} />
+              <a href="#reviews" className="hover:underline">
+                {reviewSummary.totalCount}{" "}
+                {reviewSummary.totalCount === 1 ? "review" : "reviews"}
+              </a>
             </div>
           </div>
 
@@ -127,9 +145,13 @@ export function ProductExperience({ product }: { product: ProductDetail }) {
 
           <div className="mt-8 flex items-center justify-between gap-4">
             <p className="text-[13px] font-bold text-[#676869]">Size</p>
-            <Link href="/pages/t-shirts-size-chart" className="text-[13px] text-brand-text underline">
+            <button
+              type="button"
+              onClick={() => setSizeChartOpen(true)}
+              className="cursor-pointer text-[13px] text-brand-text underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2"
+            >
               Measurements
-            </Link>
+            </button>
           </div>
 
           <div className="mt-3 grid grid-cols-5 gap-3">
@@ -147,8 +169,6 @@ export function ProductExperience({ product }: { product: ProductDetail }) {
               </button>
             ))}
           </div>
-
-          <p className="mt-8 max-w-[560px] text-[13px] leading-7 text-[#676869]">{product.rewardText}</p>
 
           <button
             type="button"
@@ -196,9 +216,15 @@ export function ProductExperience({ product }: { product: ProductDetail }) {
       </section>
 
       <Recommendations products={product.recommendations} />
-      <Reviews productName={product.name} />
+      <ProductReviews
+        productSlug={product.slug}
+        productName={product.name}
+        initialReviews={reviews}
+        initialSummary={reviewSummary}
+      />
       <Faqs />
-      <WhatsAppButton />
+      <WhatsAppFloat />
+      <SizeChartModal open={sizeChartOpen} onClose={() => setSizeChartOpen(false)} />
     </main>
   );
 }
@@ -218,11 +244,6 @@ function ProductHeader({
 }) {
   return (
     <>
-      <div className="h-[42px] bg-brand-primary text-center text-[14px] font-bold leading-[42px] text-white">
-        <Link href="/collections/clearance-sale" className="underline-offset-2 hover:underline">
-          CLEARANCE SALE | SHOP NOW
-        </Link>
-      </div>
       <header className="grid h-[96px] grid-cols-[1fr_auto_1fr] items-center border-b border-[#d9d9d9] px-5 text-brand-text sm:px-[72px]">
         <div className="flex items-center gap-4">
           <button type="button" aria-label="Open menu" onClick={onOpenMenu} className="flex h-11 w-11 cursor-pointer items-center justify-center">
@@ -230,9 +251,9 @@ function ProductHeader({
           </button>
           <Link href="/search" className="hidden items-center gap-3 text-[9px] font-bold sm:flex"><SearchIcon /><span>Search</span></Link>
         </div>
-        <Link href="/" aria-label="AT Wardrobe home"><Image src="/logo-dark.webp" alt="AT Wardrobe" width={640} height={494} className="h-[44px] w-auto" /></Link>
+        <Link href="/" aria-label="AT Wardrobe home"><Image src="/logo-dark.webp" alt="AT Wardrobe" width={640} height={494} className="h-[64px] w-auto" /></Link>
         <nav className="flex items-center justify-end gap-7 text-[10px] font-bold leading-none">
-          <Link href="/account" className="hidden hover:underline sm:inline">Account</Link>
+          <Link href="/pages/contact" className="hidden hover:underline sm:inline">Contact Us</Link>
           <button type="button" onClick={onOpenCart} className="relative flex cursor-pointer items-center gap-3" aria-label="Open cart">
             <span className="hidden sm:inline">Cart</span><BagIcon />
             <span className="absolute -right-3 -top-2 grid h-4 w-4 place-items-center rounded-full bg-black text-[10px] text-white">{cartQuantity}</span>
@@ -273,32 +294,13 @@ function Recommendations({ products }: { products: ProductRecommendation[] }) {
                 {item.discount ? <span className="absolute left-3 top-3 bg-[#b33323] px-3 py-1 text-[12px] font-bold text-white">{item.discount}</span> : null}
               </div>
               <h3 className="mt-4 text-[13px] text-[#676869]">{item.name}</h3>
-              <p className="mt-2 text-[14px] text-[#676869]">{item.priceText}{item.originalPriceText ? <span className="ml-3 text-[#9b9b9b] line-through">{item.originalPriceText}</span> : null}</p>
+              <p className="mt-2 text-[14px] text-[#676869]">{item.priceText}{item.originalPriceText && item.originalPriceText !== item.priceText ? <span className="ml-3 text-[#9b9b9b] line-through">{item.originalPriceText}</span> : null}</p>
             </Link>
             <div className="mt-5 flex flex-wrap justify-center gap-3">
               {item.colors.map((color, index) => <span key={`${color}-${index}`} className="h-4 w-4 rounded-full border border-[#ddd]" style={{ backgroundColor: color }} />)}
             </div>
           </article>
         ))}
-      </div>
-    </section>
-  );
-}
-
-function Reviews({ productName }: { productName: string }) {
-  return (
-    <section className="px-5 py-[84px]">
-      <h2 className="text-center text-[22px] font-normal">Customer Reviews</h2>
-      <div className="mx-auto mt-8 max-w-[350px] rounded-[8px] bg-white p-5 shadow-[0_3px_15px_rgba(0,0,0,0.12)]">
-        <div className="flex justify-between"><Stars /><span className="text-[12px] text-[#676869]">07/05/2025</span></div>
-        <p className="mt-4 text-[13px] text-[#4d4f52]">Sameer khavar <span className="ml-2 rounded bg-black px-2 py-1 text-[10px] text-white">Verified</span></p>
-        <p className="mt-10 text-[14px] text-[#4d4f52]">{productName}</p>
-        <Link href="#reviews" className="mt-24 block text-[12px] underline">Full Review</Link>
-      </div>
-      <div className="mx-auto mt-9 grid max-w-[920px] gap-8 border-t border-[#e0e0e0] pt-8 md:grid-cols-3">
-        <p><Stars /> <span className="text-[13px] text-[#676869]">5.00 out of 5<br />Based on 1 review</span></p>
-        <div className="grid gap-2 text-[13px] text-[#676869]">{[5, 4, 3, 2, 1].map((n) => <p key={n}>{"★".repeat(n)}{"☆".repeat(5 - n)} <span className="ml-5 inline-block h-3 w-36 rounded-full bg-[#eee] align-middle"><span className={n === 5 ? "block h-3 rounded-full bg-black" : ""} /></span></p>)}</div>
-        <div className="grid content-center gap-3"><button className="h-41px h-[41px] rounded-full bg-black text-white">Write a review</button><button className="h-[41px] rounded-full border border-black">Ask a question</button></div>
       </div>
     </section>
   );
@@ -342,11 +344,71 @@ function Faqs() {
   );
 }
 
-function Stars() { return <span className="text-[18px] leading-none text-[#ffc400]">★★★★★</span>; }
+function SizeChartModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  useEffect(() => {
+    if (!open) return;
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") onClose();
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 p-4"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Size chart"
+      onClick={onClose}
+    >
+      <div
+        className="relative max-h-[90vh] w-full max-w-[720px] overflow-auto bg-white p-3 shadow-[0_12px_40px_rgba(0,0,0,0.28)] sm:p-5"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close size chart"
+          className="absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-white/90 text-[#222] shadow focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+        >
+          ✕
+        </button>
+        <Image
+          src="/size-chart.png"
+          alt="AT Wardrobe size chart for half sleeves premium graphic"
+          width={1200}
+          height={900}
+          className="h-auto w-full"
+          priority
+        />
+      </div>
+    </div>
+  );
+}
+
+function Stars({ rating = 0 }: { rating?: number }) {
+  const safe = Math.max(0, Math.min(5, rating));
+  return (
+    <span className="text-[18px] leading-none text-[#ffc400]" aria-label={`${safe} out of 5 stars`}>
+      {"★".repeat(safe)}
+      <span className="text-[#ddd]">{"★".repeat(5 - safe)}</span>
+    </span>
+  );
+}
 function SearchIcon() { return <svg width="23" height="23" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="8.5" stroke="currentColor" strokeWidth="1.7" /><path d="m17 17 5 5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>; }
 function BagIcon() { return <svg width="21" height="24" viewBox="0 0 21 24" fill="none" aria-hidden="true"><path d="M4.2 7.8h12.6l1.1 14.2H3.1L4.2 7.8Z" stroke="currentColor" strokeWidth="1.7" /><path d="M7.2 7.8V5.4a3.3 3.3 0 0 1 6.6 0v2.4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" /></svg>; }
 function ChevronIcon({ className = "" }: { className?: string }) { return <svg className={className} width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="m6 3.5 4.5 4.5L6 12.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" /></svg>; }
 function ShirtIcon() { return <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M6.2 2.5 9 4.1l2.8-1.6 3.3 2.1-1.7 3-1.5-.8v8H6.1v-8l-1.5.8-1.7-3 3.3-2.1Z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" /></svg>; }
 function ReturnIcon() { return <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M6 5H3v-3M3 5a7 7 0 1 1 0 8" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" /></svg>; }
 function TruckIcon() { return <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true"><path d="M2 5h9v7H2V5Zm9 2h3l2 2v3h-5V7Z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" /><circle cx="5" cy="13" r="1.4" stroke="currentColor" strokeWidth="1.3" /><circle cx="13" cy="13" r="1.4" stroke="currentColor" strokeWidth="1.3" /></svg>; }
-function WhatsAppButton() { return <button type="button" aria-label="Open WhatsApp" className="fixed bottom-6 right-7 z-30 flex h-[55px] w-[55px] cursor-pointer items-center justify-center rounded-full bg-brand-secondary text-white shadow-[0_6px_16px_rgba(0,0,0,0.24)]"><svg width="31" height="31" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M6.3 25.7 7.7 21A11 11 0 1 1 12 25.4l-5.7.3Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" /><path d="M12.3 10.4c.3-.6.5-.6.9-.6h.7c.2 0 .5.1.7.5.2.5.8 2 .9 2.2.1.2.1.4 0 .6-.2.4-.4.6-.7.9-.2.2-.4.4-.2.8.2.4.9 1.5 1.9 2.4 1.3 1.2 2.4 1.6 2.8 1.8.3.1.6.1.8-.2l1.1-1.3c.3-.4.6-.3.9-.2l2.1 1c.4.2.6.3.7.5.1.2.1 1.6-.4 2.2-.5.7-1.9 1.4-3.2 1.2-1.3-.2-3.1-.8-5.2-2.1-2.6-1.6-4.3-3.9-4.9-5.1-.6-1.1-1.4-3.1-.6-4.6Z" fill="currentColor" /></svg></button>; }

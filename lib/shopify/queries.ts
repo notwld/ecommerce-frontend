@@ -69,22 +69,6 @@ export const COLLECTION_BY_HANDLE_QUERY = `
   }
 `;
 
-export const COLLECTIONS_QUERY = `
-  query Collections($first: Int!) {
-    collections(first: $first) {
-      edges {
-        node {
-          id
-          title
-          handle
-          description
-          image { url altText width height }
-        }
-      }
-    }
-  }
-`;
-
 export const PRODUCTS_QUERY = `
   query Products($first: Int!, $after: String, $query: String, $sortKey: ProductSortKeys, $reverse: Boolean) {
     products(first: $first, after: $after, query: $query, sortKey: $sortKey, reverse: $reverse) {

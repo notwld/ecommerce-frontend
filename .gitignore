@@ -43,4 +43,6 @@ next-env.d.ts
 .firecrawl
 skills-lock.json
 pnpm-lock.yaml
-pnpm-workspace.yaml
+
+# prisma generated client
+/app/generated/prisma

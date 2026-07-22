@@ -8,6 +8,7 @@ import { useCart } from "@/components/cart/CartProvider";
 import type { CollectionSortOption } from "@/types/interactions";
 import { ImageWithSkeleton } from "@/components/ui/ImageWithSkeleton";
 import { MobileMenuDrawer } from "@/components/layout/MobileMenuDrawer";
+import { WhatsAppFloat } from "@/components/layout/SocialIcons";
 
 const sortOptions: CollectionSortOption[] = [
   "Featured",
@@ -63,28 +64,6 @@ export function CollectionExperience({
           mobileImage={collection.heroMobileImage ?? collection.heroDesktopImage}
         />
       ) : null}
-
-      <section className="grid grid-cols-2 md:grid-cols-4" aria-label="Featured collections">
-        {collection.tiles.map((tile) => (
-          <Link
-            key={tile.title}
-            href={tile.href}
-            className="group relative aspect-[480/482] cursor-pointer overflow-hidden bg-[#d9d9d9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-4"
-          >
-            <ImageWithSkeleton
-              src={tile.image}
-              alt={tile.title}
-              priority
-              sizes="(min-width: 768px) 25vw, 50vw"
-              className="object-cover object-center transition-transform duration-300 group-hover:scale-[1.025]"
-            />
-            <div className="absolute inset-0 bg-black/20" />
-            <span className="absolute inset-x-2 bottom-[34px] text-center text-[12px] font-bold uppercase tracking-[0.1em] text-white md:inset-x-4 md:text-[14px] md:tracking-[0.16em]">
-              {tile.title}
-            </span>
-          </Link>
-        ))}
-      </section>
 
       <section className="px-5 pb-20 pt-[34px] sm:px-[60px]">
         <div className="relative mb-[28px] grid grid-cols-2 items-start gap-4 md:grid-cols-[1fr_auto_1fr]">
@@ -175,7 +154,7 @@ export function CollectionExperience({
         </div>
       </section>
 
-      <WhatsAppButton />
+      <WhatsAppFloat />
     </main>
   );
 }
@@ -244,11 +223,6 @@ function CollectionHeader({
 }) {
   return (
     <>
-      <div className="h-[42px] bg-brand-primary text-center text-[14px] font-bold leading-[42px] text-white">
-        <Link href="/collections/clearance-sale" className="underline-offset-2 hover:underline">
-          CLEARANCE SALE | SHOP NOW
-        </Link>
-      </div>
       <header className="grid h-[96px] grid-cols-[1fr_auto_1fr] items-center px-5 text-brand-text sm:px-[72px]">
         <div className="flex items-center gap-4">
           <button
@@ -266,12 +240,12 @@ function CollectionHeader({
         </div>
 
         <Link href="/" aria-label="AT Wardrobe home">
-          <Image src="/logo-dark.webp" alt="AT Wardrobe" width={640} height={494} className="h-[44px] w-auto" />
+          <Image src="/logo-dark.webp" alt="AT Wardrobe" width={640} height={494} className="h-[64px] w-auto" />
         </Link>
 
         <nav className="flex items-center justify-end gap-7 text-[10px] font-bold leading-none">
-          <Link href="/account" className="hidden hover:underline sm:inline">
-            Account
+          <Link href="/pages/contact" className="hidden hover:underline sm:inline">
+            Contact Us
           </Link>
           <button
             type="button"
@@ -376,7 +350,8 @@ function CollectionProductCard({ product }: { product: CollectionProduct }) {
         <h2 className="mt-4 text-[13px] font-normal leading-5 text-[#676869]">{product.name}</h2>
         <p className="mt-1 text-[14px] leading-none text-[#676869]">
           <span>{product.priceText}</span>
-          {product.originalPriceText ? (
+          {product.originalPriceText &&
+          product.originalPriceText !== product.priceText ? (
             <span className="ml-2 text-[#9b9b9b] line-through">{product.originalPriceText}</span>
           ) : null}
         </p>
@@ -424,20 +399,5 @@ function FilterIcon() {
       <circle cx="13" cy="10" r="2" fill="white" stroke="currentColor" strokeWidth="1.3" />
       <circle cx="6" cy="15" r="2" fill="white" stroke="currentColor" strokeWidth="1.3" />
     </svg>
-  );
-}
-
-function WhatsAppButton() {
-  return (
-    <button
-      type="button"
-      aria-label="Open WhatsApp"
-      className="fixed bottom-6 right-7 z-30 flex h-[55px] w-[55px] items-center justify-center rounded-full bg-brand-secondary text-white shadow-[0_6px_16px_rgba(0,0,0,0.24)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-secondary focus-visible:ring-offset-2"
-    >
-      <svg width="31" height="31" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <path d="M6.3 25.7 7.7 21A11 11 0 1 1 12 25.4l-5.7.3Z" stroke="currentColor" strokeWidth="2" strokeLinejoin="round" />
-        <path d="M12.3 10.4c.3-.6.5-.6.9-.6h.7c.2 0 .5.1.7.5.2.5.8 2 .9 2.2.1.2.1.4 0 .6-.2.4-.4.6-.7.9-.2.2-.4.4-.2.8.2.4.9 1.5 1.9 2.4 1.3 1.2 2.4 1.6 2.8 1.8.3.1.6.1.8-.2l1.1-1.3c.3-.4.6-.3.9-.2l2.1 1c.4.2.6.3.7.5.1.2.1 1.6-.4 2.2-.5.7-1.9 1.4-3.2 1.2-1.3-.2-3.1-.8-5.2-2.1-2.6-1.6-4.3-3.9-4.9-5.1-.6-1.1-1.4-3.1-.6-4.6Z" fill="currentColor" />
-      </svg>
-    </button>
   );
 }
