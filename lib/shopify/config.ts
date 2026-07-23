@@ -1,8 +1,9 @@
 function requireEnv(name: string, value: string | undefined): string {
-  if (!value) {
+  const trimmed = value?.trim();
+  if (!trimmed) {
     throw new Error(`Missing required environment variable: ${name}`);
   }
-  return value;
+  return trimmed;
 }
 
 export function getShopifyConfig() {
@@ -15,7 +16,7 @@ export function getShopifyConfig() {
     "SHOPIFY_PRIVATE_ACCESS_TOKEN",
     process.env.SHOPIFY_PRIVATE_ACCESS_TOKEN,
   );
-  const apiVersion = process.env.SHOPIFY_API_VERSION ?? "2025-01";
+  const apiVersion = (process.env.SHOPIFY_API_VERSION ?? "2025-01").trim();
 
   return {
     shop,
@@ -31,8 +32,8 @@ export function getShopifyConfig() {
 // with read_orders scope in SHOPIFY_ADMIN_ACCESS_TOKEN.
 export function getShopifyAdminConfig() {
   const shop = requireEnv("SHOPIFY_SHOP", process.env.SHOPIFY_SHOP);
-  const adminAccessToken = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN;
-  const apiVersion = process.env.SHOPIFY_API_VERSION ?? "2025-01";
+  const adminAccessToken = process.env.SHOPIFY_ADMIN_ACCESS_TOKEN?.trim();
+  const apiVersion = (process.env.SHOPIFY_API_VERSION ?? "2025-01").trim();
 
   return {
     adminAccessToken,

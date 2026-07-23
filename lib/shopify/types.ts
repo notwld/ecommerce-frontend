@@ -82,20 +82,39 @@ export type ShopifyPageInfo = {
   endCursor: string | null;
 };
 
+export type ShopifyCartUserError = {
+  field?: string[] | null;
+  message: string;
+  code?: string | null;
+};
+
+export type ShopifyCartWarning = {
+  code?: string | null;
+  message: string;
+};
+
 // Raw Storefront cart shape (from CART_FIELDS)
 export type ShopifyCart = {
   id: string;
   checkoutUrl: string;
   totalQuantity: number;
-  cost: { subtotalAmount: ShopifyMoney };
+  cost: {
+    subtotalAmount: ShopifyMoney;
+    totalAmount: ShopifyMoney;
+  };
   lines: {
     edges: Array<{
       node: {
         id: string;
         quantity: number;
+        cost: {
+          totalAmount: ShopifyMoney;
+          amountPerQuantity: ShopifyMoney;
+        };
         merchandise: {
           id: string;
           title: string;
+          availableForSale: boolean;
           image?: { url: string; altText: string | null } | null;
           price: ShopifyMoney;
           product: { title: string; handle: string };
@@ -112,8 +131,14 @@ export type CartLine = {
   title: string;
   variantTitle: string;
   image: string | null;
+  /** Unit price */
   price: ShopifyMoney;
+  /** Line total (qty × unit, from Shopify cart line cost) */
+  lineTotal: ShopifyMoney;
   href: string;
+  availableForSale: boolean;
+  /** null when inventory quantity is not exposed by the Storefront token */
+  quantityAvailable: number | null;
 };
 
 export type Cart = {

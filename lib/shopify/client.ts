@@ -21,13 +21,21 @@ export async function shopifyFetch<T>(
   variables?: Record<string, unknown>,
   options?: { noStore?: boolean },
 ): Promise<T> {
-  const { endpoint, privateAccessToken } = getShopifyConfig();
+  const { endpoint, publicAccessToken, privateAccessToken } = getShopifyConfig();
+
+  // Prefer a real Storefront token. Admin tokens (shpat_...) are not Storefront
+  // credentials — only use the private header when it is not an Admin token.
+  const usePrivateStorefrontHeader = Boolean(
+    privateAccessToken && !privateAccessToken.startsWith("shpat_"),
+  );
 
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Shopify-Storefront-Private-Token": privateAccessToken,
+      ...(usePrivateStorefrontHeader
+        ? { "Shopify-Storefront-Private-Token": privateAccessToken }
+        : { "X-Shopify-Storefront-Access-Token": publicAccessToken }),
     },
     body: JSON.stringify({ query, variables }),
     ...(options?.noStore ? { cache: "no-store" } : { next: { revalidate: 60 } }),
@@ -44,6 +52,14 @@ export async function shopifyFetch<T>(
   if (payload.errors?.length) {
     const firstError = payload.errors[0];
     const code = firstError.extensions?.code;
+    const message = firstError.message || "";
+
+    if (code === "ACCESS_DENIED" && /access scope/i.test(message)) {
+      throw new ShopifyApiError(
+        "This store action needs extra Shopify permissions. Please try again or contact support.",
+        code,
+      );
+    }
 
     if (code === "UNAUTHORIZED" || code === "ACCESS_DENIED") {
       throw new ShopifyApiError(

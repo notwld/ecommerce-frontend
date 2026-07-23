@@ -23,7 +23,7 @@ export function HomePage({ featuredProducts, categories }: HomePageProps) {
         <CategorySection
           key={category.title}
           category={category}
-          bannerImage={heroSlides[i % heroSlides.length]}
+          bannerImage={heroSlides[i % heroSlides.length].image}
         />
       ))}
     </main>

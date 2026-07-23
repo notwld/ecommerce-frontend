@@ -22,6 +22,16 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | null>(null);
 
+function applyResult(res: CartResult, setCart: (cart: Cart | null) => void) {
+  // Always keep the latest cart Shopify returned, even on userErrors (e.g. out of stock),
+  // so quantity controls and subtotal stay in sync instead of wiping the drawer.
+  if (res.ok) {
+    setCart(res.cart);
+    return;
+  }
+  if (res.cart !== undefined) setCart(res.cart);
+}
+
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<Cart | null>(null);
   const [open, setOpen] = useState(false);
@@ -34,22 +44,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   async function add(variantId: string, quantity = 1) {
     const res = await addToCart(variantId, quantity);
-    if (res.ok) {
-      setCart(res.cart);
-      setOpen(true);
-    }
+    applyResult(res, setCart);
+    if (res.ok) setOpen(true);
     return res;
   }
 
   async function setQty(lineId: string, quantity: number) {
     const res = await updateLine(lineId, quantity);
-    if (res.ok) setCart(res.cart);
+    applyResult(res, setCart);
     return res;
   }
 
   async function remove(lineId: string) {
     const res = await removeLine(lineId);
-    if (res.ok) setCart(res.cart);
+    applyResult(res, setCart);
     return res;
   }
 

@@ -9,8 +9,11 @@ function getMinVariantPrice(product: ShopifyProduct) {
   return product.priceRange.minVariantPrice;
 }
 
-export function formatShopifyMoney(money: { amount: string; currencyCode: string }) {
+export function formatShopifyMoney(money: { amount: string; currencyCode: string } | null | undefined) {
+  if (!money?.amount || !money.currencyCode) return "—";
+
   const value = Number.parseFloat(money.amount);
+  if (!Number.isFinite(value)) return "—";
 
   if (money.currencyCode === "PKR") {
     return `Rs.${new Intl.NumberFormat("en-PK", {
