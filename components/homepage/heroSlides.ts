@@ -17,7 +17,7 @@ export type HeroSlide = {
 /** Original PNGs from /public/increase q — served as-is (no webp conversion). */
 export const heroSlides: HeroSlide[] = [
   {
-    image: "/increase q/ChatGPT Image Aug 1, 2026, 08_11_09 PM (2).png",
+    image: "/increase q/ChatGPT Image Aug 1, 2026, 08_11_09 PM (2).webp",
     eyebrow: "THE DROP",
     title: "NEW ARRIVALS",
     lines: ["Designed with Purpose. Built for Confidence."],
@@ -27,7 +27,7 @@ export const heroSlides: HeroSlide[] = [
     mobileObjectPosition: "center 20%",
   },
   {
-    image: "/increase q/tinywow_FRONT COVER 2_91108327.png",
+    image: "/increase q/tinywow_FRONT COVER 2_91108327.webp",
     eyebrow: "PREMIUM ESSENTIALS",
     title: "BUILT FOR EVERYDAY",
     lines: ["Timeless Style.", "Crafted to Last."],
@@ -37,7 +37,7 @@ export const heroSlides: HeroSlide[] = [
     mobileObjectPosition: "70% 10%",
   },
   {
-    image: "/increase q/tinywow_FRONT COVER 3_91108213.png",
+    image: "/increase q/tinywow_FRONT COVER 3_91108213.webp",
     eyebrow: "AT WARDROBE",
     title: "WEAR YOUR IDENTITY",
     lines: ["Express Yourself.", "Own Every Moment."],
@@ -47,7 +47,7 @@ export const heroSlides: HeroSlide[] = [
     mobileObjectPosition: "76% 12%",
   },
   {
-    image: "/increase q/tinywow_FRONT COVER 4- aNOTHER_91108266.png",
+    image: "/increase q/tinywow_FRONT COVER 4- aNOTHER_91108266.webp",
     eyebrow: "PREMIUM STREETWEAR",
     title: "DEFINE YOUR LOOK",
     lines: ["Lasting Quality.", "Crafted for Comfort."],
