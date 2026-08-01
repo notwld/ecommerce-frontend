@@ -13,45 +13,42 @@ export type HeroSlide = {
   objectPosition: string;
 };
 
+/** Original PNGs from /public/increase q — served as-is (no webp conversion). */
 export const heroSlides: HeroSlide[] = [
   {
-    image: "/hero/cover-1.webp",
+    image: "/increase q/ChatGPT Image Aug 1, 2026, 08_11_09 PM (2).png",
     eyebrow: "THE DROP",
     title: "NEW ARRIVALS",
     lines: ["Designed with Purpose. Built for Confidence."],
     cta: { label: "EXPLORE NOW", href: "/collections/all" },
     tone: "light",
-    // Couple centered; keep heads below the top edge
     objectPosition: "center 18%",
   },
   {
-    image: "/hero/cover-2.webp",
+    image: "/increase q/tinywow_FRONT COVER 2_91108327.png",
     eyebrow: "PREMIUM ESSENTIALS",
     title: "BUILT FOR EVERYDAY",
     lines: ["Timeless Style.", "Crafted to Last."],
     cta: { label: "EXPLORE NOW", href: "/collections/all" },
     tone: "dark",
-    // Model on the right, head near top of frame
     objectPosition: "78% 8%",
   },
   {
-    image: "/hero/cover-3.webp",
+    image: "/increase q/tinywow_FRONT COVER 3_91108213.png",
     eyebrow: "AT WARDROBE",
     title: "WEAR YOUR IDENTITY",
     lines: ["Express Yourself.", "Own Every Moment."],
     cta: { label: "EXPLORE NOW", href: "/collections/all" },
     tone: "light",
-    // Dark slide — subject far right; anchor top-right so face isn't cropped
     objectPosition: "88% 12%",
   },
   {
-    image: "/hero/cover-4.webp",
+    image: "/increase q/tinywow_FRONT COVER 4- aNOTHER_91108266.png",
     eyebrow: "PREMIUM STREETWEAR",
     title: "DEFINE YOUR LOOK",
     lines: ["Lasting Quality.", "Crafted for Comfort."],
     cta: { label: "EXPLORE NOW", href: "/collections/all" },
     tone: "dark",
-    // Woman on the right with headroom in source
     objectPosition: "82% 15%",
   },
 ];

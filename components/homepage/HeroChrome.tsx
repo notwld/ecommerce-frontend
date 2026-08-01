@@ -53,7 +53,8 @@ export function HeroChrome() {
               alt={`${current.eyebrow} — ${current.title}`}
               fill
               priority={slide === 0}
-              sizes="100vw"
+              sizes="110vw"
+              unoptimized
               className="object-cover"
               style={{ objectPosition: current.objectPosition }}
             />

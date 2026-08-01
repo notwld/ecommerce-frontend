@@ -34,7 +34,7 @@ export default function TrackPage() {
       <Link href="/" className="text-[12px] text-[#676869] underline">
         ← Back to store
       </Link>
-      <h1 className="mt-6 text-[28px] font-normal">Track your order</h1>
+      <h1 className="mt-6 text-[clamp(22px,5vw,28px)] font-normal">Track your order</h1>
       <p className="mt-2 text-[14px] text-[#676869]">
         Enter your order number and the email you used at checkout.
       </p>
