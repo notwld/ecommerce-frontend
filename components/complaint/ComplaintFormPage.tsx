@@ -79,9 +79,9 @@ export function ComplaintFormPage() {
   return (
     <main className="min-h-screen bg-[#f3f3f3] text-brand-text">
       <header className="border-b border-[#d9d9d9] bg-[#f3f3f3]">
-        <div className="mx-auto grid h-[96px] max-w-[1500px] grid-cols-[1fr_auto_1fr] items-center px-6 sm:px-10 lg:px-14">
+        <div className="mx-auto grid h-[96px] max-w-[1500px] grid-cols-[1fr_auto_1fr] items-center px-4 md:px-10 lg:px-14">
           <div className="flex items-center gap-5 text-[#1f1f1f]">
-            <Link href="/search" className="text-[9px] hover:underline">
+            <Link href="/search" className="hidden text-[9px] hover:underline md:inline">
               Search
             </Link>
           </div>
@@ -91,18 +91,18 @@ export function ComplaintFormPage() {
               alt="AT Wardrobe"
               width={640}
               height={494}
-              className="h-[72px] w-auto"
+              className="h-14 w-auto md:h-[72px]"
             />
           </Link>
-          <nav className="flex items-center justify-end gap-5 text-[9px]">
-            <Link href="/pages/contact" className="hover:underline">
+          <nav className="flex items-center justify-end gap-3 text-[9px] md:gap-5">
+            <Link href="/pages/contact" className="hidden hover:underline md:inline">
               Contact
             </Link>
           </nav>
         </div>
       </header>
 
-      <section className="border-b border-[#e4e4e4] px-5 pb-20 pt-12 sm:px-10 lg:px-20">
+      <section className="border-b border-[#e4e4e4] px-4 pb-20 pt-12 md:px-10 lg:px-20">
         <div className="mx-auto max-w-[760px]">
           <h1 className="text-[38px] font-normal leading-none text-[#1f1f1f]">
             Complaint Form
@@ -132,7 +132,7 @@ export function ComplaintFormPage() {
                 Customer Information
               </legend>
 
-              <div className="grid gap-5 sm:grid-cols-2">
+              <div className="grid gap-5 md:grid-cols-2">
                 <Field
                   id="complaint-name"
                   label="Full Name"
@@ -172,7 +172,7 @@ export function ComplaintFormPage() {
                 </Field>
               </div>
 
-              <div className="grid gap-5 sm:grid-cols-2">
+              <div className="grid gap-5 md:grid-cols-2">
                 <Field id="complaint-phone" label="Phone Number (Optional)">
                   <input
                     id="complaint-phone"

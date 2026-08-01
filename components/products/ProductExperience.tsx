@@ -66,7 +66,7 @@ export function ProductExperience({
         onOpenMenu={() => setMenuOpen(true)}
       />
 
-      <section className="mx-auto grid max-w-[1360px] gap-11 px-5 pb-12 pt-[38px] lg:grid-cols-[1.05fr_0.95fr] lg:px-8">
+      <section className="mx-auto grid max-w-[1360px] gap-11 px-4 pb-12 pt-[38px] md:px-5 lg:grid-cols-[1.05fr_0.95fr] lg:px-8">
         <div>
           <nav className="mb-6 flex flex-wrap items-center gap-2 text-[11px] text-[#676869]" aria-label="Breadcrumb">
             <Link href="/" className="hover:underline">Home</Link>
@@ -154,7 +154,7 @@ export function ProductExperience({
             </button>
           </div>
 
-          <div className="mt-3 grid grid-cols-5 gap-3">
+          <div className="mt-3 grid grid-cols-3 gap-3 md:grid-cols-5">
             {product.sizes.map((size) => (
               <button
                 key={size}
@@ -244,18 +244,18 @@ function ProductHeader({
 }) {
   return (
     <>
-      <header className="grid h-[96px] grid-cols-[1fr_auto_1fr] items-center border-b border-[#d9d9d9] px-5 text-brand-text sm:px-[72px]">
+      <header className="grid h-[96px] grid-cols-[1fr_auto_1fr] items-center border-b border-[#d9d9d9] px-4 text-brand-text md:px-[72px]">
         <div className="flex items-center gap-4">
           <button type="button" aria-label="Open menu" onClick={onOpenMenu} className="flex h-11 w-11 cursor-pointer items-center justify-center">
             <span className="relative block h-[14px] w-[20px] before:absolute before:left-0 before:top-0 before:h-[2px] before:w-full before:bg-current after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-current" />
           </button>
-          <Link href="/search" className="hidden items-center gap-3 text-[9px] font-bold sm:flex"><SearchIcon /><span>Search</span></Link>
+          <Link href="/search" className="hidden items-center gap-3 text-[9px] font-bold md:flex"><SearchIcon /><span>Search</span></Link>
         </div>
-        <Link href="/" aria-label="AT Wardrobe home"><Image src="/logo-dark.webp" alt="AT Wardrobe" width={640} height={494} className="h-[64px] w-auto" /></Link>
-        <nav className="flex items-center justify-end gap-7 text-[10px] font-bold leading-none">
-          <Link href="/pages/contact" className="hidden hover:underline sm:inline">Contact Us</Link>
+        <Link href="/" aria-label="AT Wardrobe home"><Image src="/logo-dark.webp" alt="AT Wardrobe" width={640} height={494} className="h-14 w-auto md:h-[64px]" /></Link>
+        <nav className="flex items-center justify-end gap-4 text-[10px] font-bold leading-none md:gap-7">
+          <Link href="/pages/contact" className="hidden hover:underline md:inline">Contact Us</Link>
           <button type="button" onClick={onOpenCart} className="relative flex cursor-pointer items-center gap-3" aria-label="Open cart">
-            <span className="hidden sm:inline">Cart</span><BagIcon />
+            <span className="hidden md:inline">Cart</span><BagIcon />
             <span className="absolute -right-3 -top-2 grid h-4 w-4 place-items-center rounded-full bg-black text-[10px] text-white">{cartQuantity}</span>
           </button>
         </nav>
@@ -283,7 +283,7 @@ function Accordion({ title, icon, open, onToggle, children }: { title: string; i
 
 function Recommendations({ products }: { products: ProductRecommendation[] }) {
   return (
-    <section className="bg-[#f7f7f8] px-5 py-[50px] sm:px-[60px]">
+    <section className="bg-[#f7f7f8] px-4 py-[50px] md:px-[60px]">
       <h2 className="text-center text-[21px] font-normal">You may also like...</h2>
       <div className="mt-8 grid grid-cols-2 gap-x-[30px] gap-y-12 md:grid-cols-4">
         {products.map((item) => (

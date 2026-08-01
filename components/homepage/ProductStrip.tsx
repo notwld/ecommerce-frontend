@@ -22,7 +22,7 @@ export function ProductStrip({
   emptyMessage = "No products are available right now. Please check back soon.",
 }: ProductStripProps) {
   return (
-    <section className="bg-brand-background px-4 pb-16 pt-[46px] sm:px-8 lg:px-16">
+    <section className="bg-brand-background px-4 pb-16 pt-[46px] md:px-8 lg:px-16">
       <div className="mx-auto max-w-[1360px]">
         <div className="mb-[31px] text-center">
           <Link

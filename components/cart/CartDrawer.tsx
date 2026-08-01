@@ -49,7 +49,7 @@ export function CartDrawer() {
         className="flex-1 cursor-pointer"
       />
       <aside className="flex h-full w-[536px] max-w-full flex-col bg-white text-brand-text shadow-[-8px_0_24px_rgba(0,0,0,0.12)]">
-        <div className="flex items-center justify-between px-[31px] pb-7 pt-[29px]">
+        <div className="flex items-center justify-between px-4 pb-7 pt-[29px] md:px-[31px]">
           <h2 className="text-[22px] font-normal leading-none">
             Your cart ({cart?.totalQuantity ?? 0})
           </h2>
@@ -63,7 +63,7 @@ export function CartDrawer() {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-[31px]">
+        <div className="flex-1 overflow-y-auto px-4 md:px-[31px]">
           {lines.length === 0 ? (
             <p className="py-16 text-center text-[14px] text-[#676869]">
               Your cart is empty. Browse products and add something you like.
@@ -77,9 +77,9 @@ export function CartDrawer() {
               return (
                 <div
                   key={line.id}
-                  className="grid grid-cols-[100px_1fr_auto] gap-6 border-b border-[#eee] py-6"
+                  className="grid grid-cols-[72px_1fr] gap-4 border-b border-[#eee] py-6 md:grid-cols-[100px_1fr_auto] md:gap-6"
                 >
-                  <div className="relative h-[150px] w-[100px] overflow-hidden bg-[#f0f1f3]">
+                  <div className="relative h-[108px] w-[72px] overflow-hidden bg-[#f0f1f3] md:h-[150px] md:w-[100px]">
                     {line.image ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -140,7 +140,7 @@ export function CartDrawer() {
                       Remove
                     </button>
                   </div>
-                  <div className="text-right text-[14px] font-bold text-[#4d4f52]">
+                  <div className="col-span-2 justify-self-end text-right text-[14px] font-bold text-[#4d4f52] md:col-span-1">
                     {formatShopifyMoney(line.lineTotal)}
                   </div>
                 </div>
@@ -149,9 +149,9 @@ export function CartDrawer() {
           )}
         </div>
 
-        {error ? <p className="px-[31px] pt-4 text-[13px] text-[#b33323]">{error}</p> : null}
+        {error ? <p className="px-4 pt-4 text-[13px] text-[#b33323] md:px-[31px]">{error}</p> : null}
 
-        <div className="border-t border-[#e3e3e3] px-[31px] py-7">
+        <div className="border-t border-[#e3e3e3] px-4 py-7 md:px-[31px]">
           <div className="flex items-center justify-between text-[22px] leading-none">
             <p>Subtotal:</p>
             <p>{subtotal ? formatShopifyMoney(subtotal) : "—"}</p>

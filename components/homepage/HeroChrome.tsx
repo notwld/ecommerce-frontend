@@ -37,7 +37,7 @@ export function HeroChrome() {
   const chromeTone = current.tone === "light" ? "text-white" : "text-[#111111]";
 
   return (
-    <section className="relative h-[calc(100dvh-42px)] min-h-[480px] w-full overflow-hidden bg-[#1a1a1a]">
+    <section className="relative h-[calc(100svh-42px)] min-h-[560px] w-full overflow-hidden bg-[#1a1a1a] md:h-[calc(100dvh-42px)] md:min-h-[480px]">
       <div className="relative h-full w-full overflow-hidden">
         <AnimatePresence mode="wait">
           <motion.div
@@ -55,8 +55,11 @@ export function HeroChrome() {
               priority={slide === 0}
               sizes="110vw"
               unoptimized
-              className="object-cover"
-              style={{ objectPosition: current.objectPosition }}
+              className="hero-image object-cover"
+              style={{
+                "--hero-object-position": current.objectPosition,
+                "--hero-mobile-object-position": current.mobileObjectPosition,
+              } as React.CSSProperties}
             />
             {current.tone === "light" ? (
               <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent" />
@@ -67,16 +70,16 @@ export function HeroChrome() {
         </AnimatePresence>
 
         <div
-          className={`pointer-events-none absolute inset-0 z-10 flex flex-col justify-center px-6 sm:px-12 md:px-[72px] lg:px-24 ${toneClass}`}
+          className={`pointer-events-none absolute inset-0 z-10 flex flex-col justify-end px-5 pb-[clamp(88px,14vh,144px)] md:justify-center md:px-[72px] md:pb-0 lg:px-24 ${toneClass}`}
         >
           <div className={`${display.className} max-w-[18ch] md:max-w-[22ch]`}>
             <p className="text-[clamp(11px,1.4vw,15px)] font-semibold uppercase tracking-[0.28em]">
               {current.eyebrow}
             </p>
-            <h1 className="mt-3 text-[clamp(36px,7vw,92px)] font-bold uppercase leading-[0.92] tracking-[-0.02em]">
+            <h1 className="mt-3 text-[clamp(40px,12vw,92px)] font-bold uppercase leading-[0.92] tracking-[-0.02em] md:text-[clamp(36px,7vw,92px)]">
               {current.title}
             </h1>
-            <div className="mt-4 space-y-0.5 text-[clamp(15px,2vw,22px)] font-medium leading-snug tracking-wide">
+            <div className="mt-4 max-w-[25ch] space-y-0.5 text-[clamp(15px,4.2vw,22px)] font-medium leading-snug tracking-wide md:text-[clamp(15px,2vw,22px)]">
               {current.lines.map((line) => (
                 <p key={line}>{line}</p>
               ))}
@@ -86,7 +89,7 @@ export function HeroChrome() {
           <div className="pointer-events-auto mt-8">
             <Link
               href={current.cta.href}
-              className={`inline-flex items-center border px-7 py-3 text-[11px] font-semibold uppercase tracking-[0.22em] transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${borderClass} ${toneClass}`}
+              className={`inline-flex min-h-11 items-center border px-7 py-3 text-[11px] font-semibold uppercase tracking-[0.22em] transition hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${borderClass} ${toneClass}`}
             >
               {current.cta.label}
             </Link>
@@ -108,7 +111,7 @@ export function HeroChrome() {
           type="button"
           aria-label="Previous slide"
           onClick={() => go(-1)}
-          className={`absolute left-2 top-1/2 z-20 -translate-y-1/2 p-3 opacity-80 transition hover:opacity-100 sm:left-4 ${chromeTone}`}
+          className={`absolute left-1 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center opacity-80 transition hover:opacity-100 md:left-4 ${chromeTone}`}
         >
           <Chevron dir="left" />
         </button>
@@ -116,26 +119,26 @@ export function HeroChrome() {
           type="button"
           aria-label="Next slide"
           onClick={() => go(1)}
-          className={`absolute right-2 top-1/2 z-20 -translate-y-1/2 p-3 opacity-80 transition hover:opacity-100 sm:right-4 ${chromeTone}`}
+          className={`absolute right-1 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center opacity-80 transition hover:opacity-100 md:right-4 ${chromeTone}`}
         >
           <Chevron dir="right" />
         </button>
 
         <header
-          className={`absolute left-0 right-0 top-0 z-20 grid h-[118px] grid-cols-[1fr_auto_1fr] items-start px-5 pt-[40px] sm:px-[72px] ${chromeTone}`}
+          className={`absolute left-0 right-0 top-0 z-20 grid h-[96px] grid-cols-[1fr_auto_1fr] items-start px-4 pt-4 md:h-[118px] md:px-[72px] md:pt-[40px] ${chromeTone}`}
         >
           <div className="flex items-center gap-4">
             <button
               type="button"
               aria-label="Open menu"
               onClick={() => setMenuOpen(true)}
-              className="flex h-8 w-8 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current"
+              className="flex h-11 w-11 items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current"
             >
               <span className="relative block h-[14px] w-[20px] before:absolute before:left-0 before:top-0 before:h-[2px] before:w-full before:bg-current after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-current" />
             </button>
             <Link
               href="/search"
-              className="hidden items-center gap-3 text-[9px] font-bold leading-none sm:flex"
+              className="hidden items-center gap-3 text-[9px] font-bold leading-none md:flex"
               aria-label="Search"
             >
               <SearchIcon />
@@ -150,24 +153,24 @@ export function HeroChrome() {
               width={640}
               height={494}
               priority
-              className="h-[72px] w-auto"
+              className="h-14 w-auto md:h-[72px]"
             />
           </Link>
 
-          <nav className="flex items-center justify-end gap-7 text-[10px] font-bold leading-none">
+          <nav className="flex items-center justify-end gap-4 text-[10px] font-bold leading-none md:gap-7">
             <Link
               href="/pages/contact"
-              className="hidden hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current sm:inline"
+              className="hidden hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current md:inline"
             >
               Contact Us
             </Link>
             <button
               type="button"
               onClick={openCart}
-              className="relative flex items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current"
+              className="relative flex h-11 items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current"
               aria-label="Open cart"
             >
-              <span className="hidden sm:inline">Cart</span>
+              <span className="hidden md:inline">Cart</span>
               <BagIcon />
               {cart && cart.totalQuantity > 0 ? (
                 <span

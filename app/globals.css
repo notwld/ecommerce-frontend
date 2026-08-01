@@ -58,3 +58,13 @@ button:not(:disabled),
 *::-webkit-scrollbar-thumb:hover {
   background: var(--scrollbar-thumb-hover);
 }
+
+.hero-image {
+  object-position: var(--hero-object-position);
+}
+
+@media (max-width: 767px) {
+  .hero-image {
+    object-position: var(--hero-mobile-object-position);
+  }
+}

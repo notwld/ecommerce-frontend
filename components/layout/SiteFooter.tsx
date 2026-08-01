@@ -23,7 +23,7 @@ const customerCareLinks = [
 export function SiteFooter() {
   return (
     <footer className="bg-[#f1f1f1] text-[#222]">
-      <div className="mx-auto max-w-[1400px] px-8 pb-14 pt-16 sm:px-14 lg:px-16">
+      <div className="mx-auto max-w-[1400px] px-5 pb-14 pt-16 md:px-14 lg:px-16">
         <div className="grid gap-12 md:grid-cols-2 md:gap-10">
           <section>
             <h2 className="text-[13px] font-bold uppercase tracking-wide">
@@ -34,7 +34,7 @@ export function SiteFooter() {
                 <li key={item.label}>
                   <Link
                     href={item.href}
-                    className="text-[11px] text-[#2d2d2d] transition-colors hover:text-black hover:underline"
+                    className="inline-flex min-h-11 items-center text-[11px] text-[#2d2d2d] transition-colors hover:text-black hover:underline md:min-h-0"
                   >
                     {item.label}
                   </Link>
@@ -52,7 +52,7 @@ export function SiteFooter() {
                 <li key={item.label}>
                   <Link
                     href={item.href}
-                    className="text-[11px] text-[#2d2d2d] transition-colors hover:text-black hover:underline"
+                    className="inline-flex min-h-11 items-center text-[11px] text-[#2d2d2d] transition-colors hover:text-black hover:underline md:min-h-0"
                   >
                     {item.label}
                   </Link>
@@ -105,7 +105,7 @@ export function SiteFooter() {
                   target="_blank"
                   rel="noreferrer"
                   aria-label={label}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#d0d0d0] text-[#222] transition-colors hover:border-[#222] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#d0d0d0] text-[#222] transition-colors hover:border-[#222] hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent md:h-8 md:w-8"
                 >
                   <Icon size={15} />
                 </a>
@@ -114,7 +114,7 @@ export function SiteFooter() {
           </section>
         </div>
       </div>
-      <div className="flex flex-col items-center gap-4 border-t border-[#e4e4e4] px-8 py-7 sm:flex-row sm:justify-between sm:px-14 lg:px-16">
+      <div className="flex flex-col items-center gap-4 border-t border-[#e4e4e4] px-5 py-7 md:flex-row md:justify-between md:px-14 lg:px-16">
         <Image
           src="/logo-dark.webp"
           alt="AT Wardrobe"

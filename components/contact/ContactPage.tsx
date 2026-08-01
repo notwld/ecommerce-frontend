@@ -45,7 +45,7 @@ export function ContactPage() {
   return (
     <main className="min-h-screen bg-[#f3f3f3] text-brand-text">
       <ContactHeader />
-      <section className="border-b border-[#e4e4e4] px-5 pb-20 pt-12 sm:px-10 lg:px-20">
+      <section className="border-b border-[#e4e4e4] px-4 pb-20 pt-12 md:px-10 lg:px-20">
         <div className="mx-auto max-w-[760px]">
           <h1 className="text-[38px] font-normal leading-none text-[#1f1f1f]">
             Contact Us
@@ -63,7 +63,7 @@ export function ContactPage() {
             className="mt-7 grid gap-5"
             noValidate
           >
-            <div className="grid gap-5 sm:grid-cols-2">
+            <div className="grid gap-5 md:grid-cols-2">
               <Field
                 id="contact-name"
                 label="Name"
@@ -153,7 +153,7 @@ export function ContactPage() {
 function ContactHeader() {
   return (
     <header className="border-b border-[#d9d9d9] bg-[#f3f3f3]">
-      <div className="mx-auto grid h-[96px] max-w-[1500px] grid-cols-[1fr_auto_1fr] items-center px-6 sm:px-10 lg:px-14">
+        <div className="mx-auto grid h-[96px] max-w-[1500px] grid-cols-[1fr_auto_1fr] items-center px-4 md:px-10 lg:px-14">
         <div className="flex items-center gap-5 text-[#1f1f1f]">
           <button
             type="button"
@@ -162,25 +162,25 @@ function ContactHeader() {
           >
             <span className="relative block h-3 w-[18px] before:absolute before:left-0 before:top-0 before:h-[1.5px] before:w-full before:bg-current after:absolute after:bottom-0 after:left-0 after:h-[1.5px] after:w-full after:bg-current" />
           </button>
-          <Link href="/search" className="text-[9px] hover:underline">
+          <Link href="/search" className="hidden text-[9px] hover:underline md:inline">
             Search
           </Link>
         </div>
 
         <Link href="/" aria-label="AT Wardrobe home">
-          <Image src="/logo-dark.webp" alt="AT Wardrobe" width={640} height={494} className="h-[72px] w-auto" />
+          <Image src="/logo-dark.webp" alt="AT Wardrobe" width={640} height={494} className="h-14 w-auto md:h-[72px]" />
         </Link>
 
-        <nav className="flex items-center justify-end gap-5 text-[9px]">
-          <Link href="/pages/contact" className="hover:underline">
+        <nav className="flex items-center justify-end gap-3 text-[9px] md:gap-5">
+          <Link href="/pages/contact" className="hidden hover:underline md:inline">
             Contact Us
           </Link>
-          <Link href="/cart" className="hover:underline">
+          <Link href="/cart" className="hidden hover:underline md:inline">
             Cart
           </Link>
           <span
             aria-label="Cart item count"
-            className="grid h-4 w-4 place-items-center rounded-full bg-black text-[9px] text-white"
+            className="grid h-6 w-6 place-items-center rounded-full bg-black text-[9px] text-white md:h-4 md:w-4"
           >
             0
           </span>

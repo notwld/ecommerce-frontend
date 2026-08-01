@@ -39,7 +39,7 @@ export function CategoryBanner({
           />
         </div>
         <span className="pointer-events-none absolute inset-x-0 bottom-[12%] z-10 flex justify-center md:bottom-[14%]">
-          <span className="text-[clamp(1.75rem,7vw,3.5rem)] font-normal uppercase tracking-[0.32em] text-white">
+          <span className="px-4 text-center text-[clamp(1.5rem,7vw,3.5rem)] font-normal uppercase tracking-[0.2em] text-white md:px-0 md:tracking-[0.32em]">
             {title}
           </span>
         </span>

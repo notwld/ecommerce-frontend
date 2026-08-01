@@ -11,6 +11,7 @@ export type HeroSlide = {
    * Sources are landscape with heads near the top; prefer top + subject side.
    */
   objectPosition: string;
+  mobileObjectPosition: string;
 };
 
 /** Original PNGs from /public/increase q — served as-is (no webp conversion). */
@@ -23,6 +24,7 @@ export const heroSlides: HeroSlide[] = [
     cta: { label: "EXPLORE NOW", href: "/collections/all" },
     tone: "light",
     objectPosition: "center 18%",
+    mobileObjectPosition: "center 20%",
   },
   {
     image: "/increase q/tinywow_FRONT COVER 2_91108327.png",
@@ -32,6 +34,7 @@ export const heroSlides: HeroSlide[] = [
     cta: { label: "EXPLORE NOW", href: "/collections/all" },
     tone: "dark",
     objectPosition: "78% 8%",
+    mobileObjectPosition: "70% 10%",
   },
   {
     image: "/increase q/tinywow_FRONT COVER 3_91108213.png",
@@ -41,6 +44,7 @@ export const heroSlides: HeroSlide[] = [
     cta: { label: "EXPLORE NOW", href: "/collections/all" },
     tone: "light",
     objectPosition: "88% 12%",
+    mobileObjectPosition: "76% 12%",
   },
   {
     image: "/increase q/tinywow_FRONT COVER 4- aNOTHER_91108266.png",
@@ -50,5 +54,6 @@ export const heroSlides: HeroSlide[] = [
     cta: { label: "EXPLORE NOW", href: "/collections/all" },
     tone: "dark",
     objectPosition: "82% 15%",
+    mobileObjectPosition: "74% 14%",
   },
 ];

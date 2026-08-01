@@ -65,7 +65,7 @@ export function CollectionExperience({
         />
       ) : null}
 
-      <section className="px-5 pb-20 pt-[34px] sm:px-[60px]">
+      <section className="px-4 pb-20 pt-[34px] md:px-[60px]">
         <div className="relative mb-[28px] grid grid-cols-2 items-start gap-4 md:grid-cols-[1fr_auto_1fr]">
           <button
             type="button"
@@ -223,7 +223,7 @@ function CollectionHeader({
 }) {
   return (
     <>
-      <header className="grid h-[96px] grid-cols-[1fr_auto_1fr] items-center px-5 text-brand-text sm:px-[72px]">
+      <header className="grid h-[96px] grid-cols-[1fr_auto_1fr] items-center px-4 text-brand-text md:px-[72px]">
         <div className="flex items-center gap-4">
           <button
             type="button"
@@ -233,18 +233,18 @@ function CollectionHeader({
           >
             <span className="relative block h-[14px] w-[20px] before:absolute before:left-0 before:top-0 before:h-[2px] before:w-full before:bg-current after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:bg-current" />
           </button>
-          <Link href="/search" className="hidden items-center gap-3 text-[9px] font-bold sm:flex">
+          <Link href="/search" className="hidden items-center gap-3 text-[9px] font-bold md:flex">
             <SearchIcon />
             <span>Search</span>
           </Link>
         </div>
 
         <Link href="/" aria-label="AT Wardrobe home">
-          <Image src="/logo-dark.webp" alt="AT Wardrobe" width={640} height={494} className="h-[64px] w-auto" />
+          <Image src="/logo-dark.webp" alt="AT Wardrobe" width={640} height={494} className="h-14 w-auto md:h-[64px]" />
         </Link>
 
-        <nav className="flex items-center justify-end gap-7 text-[10px] font-bold leading-none">
-          <Link href="/pages/contact" className="hidden hover:underline sm:inline">
+        <nav className="flex items-center justify-end gap-4 text-[10px] font-bold leading-none md:gap-7">
+          <Link href="/pages/contact" className="hidden hover:underline md:inline">
             Contact Us
           </Link>
           <button
@@ -253,7 +253,7 @@ function CollectionHeader({
             className="relative flex cursor-pointer items-center gap-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent focus-visible:ring-offset-2"
             aria-label="Open cart"
           >
-            <span className="hidden sm:inline">Cart</span>
+            <span className="hidden md:inline">Cart</span>
             <BagIcon />
             {cartQuantity > 0 ? (
               <span className="absolute -right-3 -top-2 grid h-4 w-4 place-items-center rounded-full bg-black text-[10px] text-white">

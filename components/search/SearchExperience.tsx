@@ -202,7 +202,7 @@ function LivePreview({
         ))}
       </div>
 
-      <div className="mt-[64px] grid justify-center gap-[30px] sm:grid-cols-[248px_248px]">
+      <div className="mt-[64px] grid grid-cols-2 gap-[16px] sm:grid-cols-[248px_248px] sm:gap-[30px]">
         {products.map((product) => (
           <ProductCard key={product.id} product={product} compact />
         ))}
@@ -252,8 +252,8 @@ function FullResults({
   onToggleSize: (size: string) => void;
 }) {
   return (
-    <div className="px-5 pb-20 pt-[68px] sm:px-[60px]">
-      <div className="mb-[27px] grid grid-cols-[1fr_auto_1fr] items-center gap-4">
+    <div className="px-4 pb-20 pt-[68px] md:px-[60px]">
+      <div className="mb-[27px] grid grid-cols-2 items-center gap-x-4 gap-y-3 md:grid-cols-[1fr_auto_1fr]">
         <button
           type="button"
           onClick={onToggleFilter}
@@ -263,7 +263,7 @@ function FullResults({
           <span>Filter</span>
           <ChevronIcon className={filterOpen ? "rotate-180" : ""} />
         </button>
-        <p className="text-center text-[14px] text-[#676869]">
+        <p className="order-first col-span-2 text-center text-[14px] text-[#676869] md:order-none md:col-span-1">
           We found {resultCount} results
         </p>
         <label className="flex items-center gap-2 justify-self-end text-[12px] font-bold text-[#676869]">

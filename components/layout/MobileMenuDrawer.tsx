@@ -43,7 +43,7 @@ export function MobileMenuDrawer({
             type="button"
             aria-label="Close menu"
             onClick={onClose}
-            className="text-[#666] focus:outline-none"
+            className="flex h-11 w-11 items-center justify-center text-[#666] focus:outline-none"
           >
             <CloseIcon />
           </button>
