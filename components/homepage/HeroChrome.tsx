@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Cormorant_Garamond } from "next/font/google";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useHeroChromeInteractions } from "@/hooks/useHeroChromeInteractions";
 import { useCart } from "@/components/cart/CartProvider";
 import { MobileMenuDrawer } from "@/components/layout/MobileMenuDrawer";
@@ -21,15 +21,54 @@ export function HeroChrome() {
   const { menuOpen, setMenuOpen } = useHeroChromeInteractions();
   const { cart, openCart } = useCart();
   const [slide, setSlide] = useState(0);
+  const touchStart = useRef<{ x: number; y: number } | null>(null);
   const current = heroSlides[slide];
 
-  useEffect(() => {
-    const id = setInterval(() => setSlide((s) => (s + 1) % heroSlides.length), 6000);
-    return () => clearInterval(id);
+  const go = useCallback((delta: number) => {
+    setSlide((s) => (s + delta + heroSlides.length) % heroSlides.length);
   }, []);
 
-  function go(delta: number) {
-    setSlide((s) => (s + delta + heroSlides.length) % heroSlides.length);
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 768px)");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let id: ReturnType<typeof setInterval> | undefined;
+
+    function syncAutoplay() {
+      if (id) {
+        clearInterval(id);
+        id = undefined;
+      }
+      if (desktop.matches && !reducedMotion.matches) {
+        id = setInterval(() => go(1), 6000);
+      }
+    }
+
+    syncAutoplay();
+    desktop.addEventListener("change", syncAutoplay);
+    reducedMotion.addEventListener("change", syncAutoplay);
+    return () => {
+      if (id) clearInterval(id);
+      desktop.removeEventListener("change", syncAutoplay);
+      reducedMotion.removeEventListener("change", syncAutoplay);
+    };
+  }, [go]);
+
+  function onTouchStart(event: React.TouchEvent) {
+    touchStart.current = {
+      x: event.touches[0].clientX,
+      y: event.touches[0].clientY,
+    };
+  }
+
+  function onTouchEnd(event: React.TouchEvent) {
+    if (!touchStart.current) return;
+
+    const dx = event.changedTouches[0].clientX - touchStart.current.x;
+    const dy = event.changedTouches[0].clientY - touchStart.current.y;
+    touchStart.current = null;
+
+    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return;
+    go(dx < 0 ? 1 : -1);
   }
 
   const toneClass = current.tone === "light" ? "text-white" : "text-[#111111]";
@@ -38,7 +77,11 @@ export function HeroChrome() {
 
   return (
     <section className="relative h-[calc(100svh-42px)] min-h-[560px] w-full overflow-hidden bg-[#1a1a1a] md:h-[calc(100dvh-42px)] md:min-h-[480px]">
-      <div className="relative h-full w-full overflow-hidden">
+      <div
+        className="relative h-full w-full overflow-hidden"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+      >
         <AnimatePresence mode="wait">
           <motion.div
             key={slide}
@@ -95,11 +138,20 @@ export function HeroChrome() {
             </Link>
           </div>
 
-          <div className="mt-10 flex items-center gap-2" aria-hidden="true">
+          <div
+            className="pointer-events-auto mt-10 flex items-center gap-2"
+            role="tablist"
+            aria-label="Hero slides"
+          >
             {heroSlides.map((_, i) => (
-              <span
+              <button
                 key={i}
-                className={`h-px transition-all duration-500 ${
+                type="button"
+                role="tab"
+                aria-selected={i === slide}
+                aria-label={`Go to slide ${i + 1}`}
+                onClick={() => setSlide(i)}
+                className={`h-px transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current ${
                   i === slide ? "w-8 bg-current opacity-100" : "w-3 bg-current opacity-35"
                 }`}
               />
@@ -107,22 +159,8 @@ export function HeroChrome() {
           </div>
         </div>
 
-        <button
-          type="button"
-          aria-label="Previous slide"
-          onClick={() => go(-1)}
-          className={`absolute left-1 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center opacity-80 transition hover:opacity-100 md:left-4 ${chromeTone}`}
-        >
-          <Chevron dir="left" />
-        </button>
-        <button
-          type="button"
-          aria-label="Next slide"
-          onClick={() => go(1)}
-          className={`absolute right-1 top-1/2 z-20 flex h-11 w-11 -translate-y-1/2 items-center justify-center opacity-80 transition hover:opacity-100 md:right-4 ${chromeTone}`}
-        >
-          <Chevron dir="right" />
-        </button>
+        <SlideNavButton direction="left" onClick={() => go(-1)} />
+        <SlideNavButton direction="right" onClick={() => go(1)} />
 
         <header
           className={`absolute left-0 right-0 top-0 z-20 grid h-[96px] grid-cols-[1fr_auto_1fr] items-start px-4 pt-4 md:h-[118px] md:px-[72px] md:pt-[40px] ${chromeTone}`}
@@ -198,13 +236,46 @@ export function HeroChrome() {
   );
 }
 
+function SlideNavButton({
+  direction,
+  onClick,
+}: {
+  direction: "left" | "right";
+  onClick: () => void;
+}) {
+  const edgeClass = direction === "left" ? "left-3 md:left-4" : "right-3 md:right-4";
+
+  return (
+    <button
+      type="button"
+      aria-label={direction === "left" ? "Previous slide" : "Next slide"}
+      onClick={onClick}
+      className={`absolute z-20 flex h-11 w-11 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition hover:bg-black/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 max-[479px]:hidden bottom-[clamp(108px,20vh,168px)] md:bottom-auto md:top-1/2 md:-translate-y-1/2 ${edgeClass}`}
+    >
+      <Chevron dir={direction} />
+    </button>
+  );
+}
+
 function Chevron({ dir }: { dir: "left" | "right" }) {
   return (
-    <svg width="22" height="40" viewBox="0 0 22 40" fill="none" aria-hidden="true">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       {dir === "left" ? (
-        <path d="M18 2 4 20l14 18" stroke="currentColor" strokeWidth="1.5" />
+        <path
+          d="M15 6 9 12l6 6"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       ) : (
-        <path d="M4 2l14 18L4 38" stroke="currentColor" strokeWidth="1.5" />
+        <path
+          d="m9 6 6 6-6 6"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
       )}
     </svg>
   );
