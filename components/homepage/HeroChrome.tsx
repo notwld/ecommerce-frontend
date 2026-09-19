@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { AnimatePresence, motion } from "framer-motion";
 import { Cormorant_Garamond } from "next/font/google";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useHeroChromeInteractions } from "@/hooks/useHeroChromeInteractions";
@@ -82,35 +81,39 @@ export function HeroChrome() {
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={slide}
-            className="absolute inset-0"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
+        {/* All slides stay in the DOM so the browser fetches them with first paint (full quality, no re-encode). */}
+        {heroSlides.map((item, i) => (
+          <div
+            key={item.image}
+            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+              i === slide ? "opacity-100" : "pointer-events-none opacity-0"
+            }`}
+            aria-hidden={i !== slide}
           >
             <Image
-              src={current.image}
-              alt={`${current.eyebrow} — ${current.title}`}
+              src={item.image}
+              alt={`${item.eyebrow} — ${item.title}`}
               fill
-              priority={slide === 0}
-              sizes="110vw"
+              priority
+              loading="eager"
+              fetchPriority={i === 0 ? "high" : "low"}
+              sizes="100vw"
               unoptimized
               className="hero-image object-cover"
-              style={{
-                "--hero-object-position": current.objectPosition,
-                "--hero-mobile-object-position": current.mobileObjectPosition,
-              } as React.CSSProperties}
+              style={
+                {
+                  "--hero-object-position": item.objectPosition,
+                  "--hero-mobile-object-position": item.mobileObjectPosition,
+                } as React.CSSProperties
+              }
             />
-            {current.tone === "light" ? (
+            {item.tone === "light" ? (
               <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent" />
             ) : (
               <div className="absolute inset-0 bg-gradient-to-r from-white/25 via-transparent to-transparent md:from-transparent" />
             )}
-          </motion.div>
-        </AnimatePresence>
+          </div>
+        ))}
 
         <div
           className={`pointer-events-none absolute inset-0 z-10 flex flex-col justify-end px-5 pb-[clamp(88px,14vh,144px)] md:justify-center md:px-[72px] md:pb-0 lg:px-24 ${toneClass}`}
