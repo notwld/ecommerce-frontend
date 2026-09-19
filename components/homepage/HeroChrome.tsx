@@ -81,39 +81,59 @@ export function HeroChrome() {
         onTouchStart={onTouchStart}
         onTouchEnd={onTouchEnd}
       >
-        {/* All slides stay in the DOM so the browser fetches them with first paint (full quality, no re-encode). */}
-        {heroSlides.map((item, i) => (
-          <div
-            key={item.image}
-            className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-              i === slide ? "opacity-100" : "pointer-events-none opacity-0"
-            }`}
-            aria-hidden={i !== slide}
-          >
-            <Image
-              src={item.image}
-              alt={`${item.eyebrow} — ${item.title}`}
-              fill
-              priority
-              loading="eager"
-              fetchPriority={i === 0 ? "high" : "low"}
-              sizes="100vw"
-              unoptimized
-              className="hero-image object-cover"
-              style={
-                {
-                  "--hero-object-position": item.objectPosition,
-                  "--hero-mobile-object-position": item.mobileObjectPosition,
-                } as React.CSSProperties
-              }
-            />
-            {item.tone === "light" ? (
-              <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent" />
-            ) : (
-              <div className="absolute inset-0 bg-gradient-to-r from-white/25 via-transparent to-transparent md:from-transparent" />
-            )}
-          </div>
-        ))}
+        {heroSlides.map((item, i) => {
+          const isActive = i === slide;
+          const isFirst = i === 0;
+
+          return (
+            <div
+              key={item.image}
+              className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+                isActive ? "opacity-100" : "pointer-events-none opacity-0"
+              }`}
+              aria-hidden={!isActive}
+            >
+              {/* Native <img> for slide 1 so LCP is not gated on next/image. */}
+              {isFirst ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={item.image}
+                  alt={`${item.eyebrow} — ${item.title}`}
+                  decoding="sync"
+                  fetchPriority="high"
+                  className="hero-image absolute inset-0 h-full w-full object-cover"
+                  style={
+                    {
+                      "--hero-object-position": item.objectPosition,
+                      "--hero-mobile-object-position": item.mobileObjectPosition,
+                    } as React.CSSProperties
+                  }
+                />
+              ) : (
+                <Image
+                  src={item.image}
+                  alt={`${item.eyebrow} — ${item.title}`}
+                  fill
+                  loading="lazy"
+                  sizes="100vw"
+                  unoptimized
+                  className="hero-image object-cover"
+                  style={
+                    {
+                      "--hero-object-position": item.objectPosition,
+                      "--hero-mobile-object-position": item.mobileObjectPosition,
+                    } as React.CSSProperties
+                  }
+                />
+              )}
+              {item.tone === "light" ? (
+                <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent" />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-r from-white/25 via-transparent to-transparent md:from-transparent" />
+              )}
+            </div>
+          );
+        })}
 
         <div
           className={`pointer-events-none absolute inset-0 z-10 flex flex-col justify-end px-5 pb-[clamp(88px,14vh,144px)] md:justify-center md:px-[72px] md:pb-0 lg:px-24 ${toneClass}`}

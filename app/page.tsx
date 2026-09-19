@@ -1,24 +1,29 @@
-import { HomePage } from "@/components/homepage/HomePage";
+import { Suspense } from "react";
+import { HeroChrome } from "@/components/homepage/HeroChrome";
+import { HomeBelowFold } from "@/components/homepage/HomeBelowFold";
 import { heroSlides } from "@/components/homepage/heroSlides";
-import { fetchHomepageData } from "@/lib/shopify/api";
 
 export const revalidate = 60;
 
-export default async function Page() {
-  const { featuredProducts, categories } = await fetchHomepageData();
+export default function Page() {
+  const first = heroSlides[0];
 
   return (
     <>
-      {heroSlides.map((slide, i) => (
-        <link
-          key={slide.image}
-          rel="preload"
-          as="image"
-          href={encodeURI(slide.image)}
-          fetchPriority={i === 0 ? "high" : "low"}
-        />
-      ))}
-      <HomePage featuredProducts={featuredProducts} categories={categories} />
+      {/* Only the LCP image — preloading all 4 starved the first slide. */}
+      <link
+        rel="preload"
+        as="image"
+        href={first.image}
+        fetchPriority="high"
+      />
+      <main className="min-h-screen bg-brand-background text-brand-text">
+        {/* Hero streams immediately — does not wait for Shopify. */}
+        <HeroChrome />
+        <Suspense fallback={null}>
+          <HomeBelowFold />
+        </Suspense>
+      </main>
     </>
   );
 }
