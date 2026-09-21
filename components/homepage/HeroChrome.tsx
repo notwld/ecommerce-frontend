@@ -307,7 +307,7 @@ function SlideNavButton({
       type="button"
       aria-label={direction === "left" ? "Previous slide" : "Next slide"}
       onClick={onClick}
-      className={`absolute z-20 flex h-11 w-11 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition hover:bg-black/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 bottom-[clamp(108px,20vh,168px)] md:bottom-auto md:top-1/2 md:-translate-y-1/2 ${edgeClass}`}
+      className={`absolute z-20 hidden h-11 w-11 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition hover:bg-black/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 md:flex md:top-1/2 md:-translate-y-1/2 ${edgeClass}`}
     >
       <Chevron dir={direction} />
     </button>
