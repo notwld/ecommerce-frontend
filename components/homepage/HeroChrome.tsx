@@ -20,12 +20,74 @@ export function HeroChrome() {
   const { menuOpen, setMenuOpen } = useHeroChromeInteractions();
   const { cart, openCart } = useCart();
   const [slide, setSlide] = useState(0);
+  const [underlay, setUnderlay] = useState(0);
+  const [loaded, setLoaded] = useState<boolean[]>(() => heroSlides.map(() => false));
+  const loadedRef = useRef(loaded);
+  const slideRef = useRef(slide);
+  const pendingRef = useRef<number | null>(null);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
   const current = heroSlides[slide];
 
-  const go = useCallback((delta: number) => {
-    setSlide((s) => (s + delta + heroSlides.length) % heroSlides.length);
+  loadedRef.current = loaded;
+  slideRef.current = slide;
+
+  const markLoaded = useCallback((index: number) => {
+    setLoaded((prev) => {
+      if (prev[index]) return prev;
+      const next = [...prev];
+      next[index] = true;
+      return next;
+    });
   }, []);
+
+  const commitSlide = useCallback((target: number) => {
+    setUnderlay(slideRef.current);
+    setSlide(target);
+  }, []);
+
+  /** Never fade to a slide until its image is in cache — avoids the Vercel black gap. */
+  const goTo = useCallback(
+    (index: number) => {
+      const target = (index + heroSlides.length) % heroSlides.length;
+      if (target === slideRef.current) return;
+
+      if (loadedRef.current[target]) {
+        pendingRef.current = null;
+        commitSlide(target);
+        return;
+      }
+
+      pendingRef.current = target;
+      const img = new window.Image();
+      img.decoding = "async";
+      img.onload = () => {
+        markLoaded(target);
+        if (pendingRef.current === target) {
+          pendingRef.current = null;
+          commitSlide(target);
+        }
+      };
+      img.src = heroSlides[target].image;
+    },
+    [commitSlide, markLoaded],
+  );
+
+  const go = useCallback(
+    (delta: number) => {
+      goTo(slideRef.current + delta);
+    },
+    [goTo],
+  );
+
+  // Warm the browser cache for every slide (localhost is fast; Vercel needs this).
+  useEffect(() => {
+    heroSlides.forEach((item, i) => {
+      const img = new window.Image();
+      img.decoding = "async";
+      img.onload = () => markLoaded(i);
+      img.src = item.image;
+    });
+  }, [markLoaded]);
 
   useEffect(() => {
     const desktop = window.matchMedia("(min-width: 768px)");
@@ -83,49 +145,37 @@ export function HeroChrome() {
       >
         {heroSlides.map((item, i) => {
           const isActive = i === slide;
-          const isFirst = i === 0;
+          const isUnderlay = i === underlay && i !== slide;
 
           return (
             <div
               key={item.image}
-              className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-                isActive ? "opacity-100" : "pointer-events-none opacity-0"
+              className={`absolute inset-0 ${
+                isActive
+                  ? "z-[2] opacity-100 transition-opacity duration-700 ease-in-out"
+                  : isUnderlay
+                    ? "z-[1] opacity-100"
+                    : "pointer-events-none z-0 opacity-0"
               }`}
               aria-hidden={!isActive}
             >
-              {/* Native <img> for slide 1 so LCP is not gated on next/image. */}
-              {isFirst ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={item.image}
-                  alt={`${item.eyebrow} — ${item.title}`}
-                  decoding="sync"
-                  fetchPriority="high"
-                  className="hero-image absolute inset-0 h-full w-full object-cover"
-                  style={
-                    {
-                      "--hero-object-position": item.objectPosition,
-                      "--hero-mobile-object-position": item.mobileObjectPosition,
-                    } as React.CSSProperties
-                  }
-                />
-              ) : (
-                <Image
-                  src={item.image}
-                  alt={`${item.eyebrow} — ${item.title}`}
-                  fill
-                  loading="lazy"
-                  sizes="100vw"
-                  unoptimized
-                  className="hero-image object-cover"
-                  style={
-                    {
-                      "--hero-object-position": item.objectPosition,
-                      "--hero-mobile-object-position": item.mobileObjectPosition,
-                    } as React.CSSProperties
-                  }
-                />
-              )}
+              {/* Eager native imgs so Vercel does not lazy-skip opacity:0 slides. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={item.image}
+                alt={`${item.eyebrow} — ${item.title}`}
+                decoding="async"
+                loading="eager"
+                fetchPriority={i === 0 ? "high" : "low"}
+                onLoad={() => markLoaded(i)}
+                className="hero-image absolute inset-0 h-full w-full object-cover"
+                style={
+                  {
+                    "--hero-object-position": item.objectPosition,
+                    "--hero-mobile-object-position": item.mobileObjectPosition,
+                  } as React.CSSProperties
+                }
+              />
               {item.tone === "light" ? (
                 <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent" />
               ) : (
@@ -173,7 +223,7 @@ export function HeroChrome() {
                 role="tab"
                 aria-selected={i === slide}
                 aria-label={`Go to slide ${i + 1}`}
-                onClick={() => setSlide(i)}
+                onClick={() => goTo(i)}
                 className={`h-px transition-all duration-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current ${
                   i === slide ? "w-8 bg-current opacity-100" : "w-3 bg-current opacity-35"
                 }`}

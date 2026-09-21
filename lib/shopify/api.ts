@@ -326,7 +326,7 @@ export async function fetchHomepageData(): Promise<{
   const categories: HomepageCategory[] = Array.from(grouped, ([slug, { title, products }]) => ({
     title: title.toUpperCase(),
     href: `/collections/${slug}`,
-    desktopImage: "", // banner comes from the shared hero pics (see HomePage)
+    desktopImage: "", // banner comes from shared hero slides
     mobileImage: "",
     products: products.slice(0, 4).map(mapToHomepageProduct),
   }));
