@@ -20,19 +20,18 @@ export function HeroChrome() {
   const { menuOpen, setMenuOpen } = useHeroChromeInteractions();
   const { cart, openCart } = useCart();
   const [slide, setSlide] = useState(0);
-  const [underlay, setUnderlay] = useState(0);
-  const [loaded, setLoaded] = useState<boolean[]>(() => heroSlides.map(() => false));
-  const loadedRef = useRef(loaded);
+  const [ready, setReady] = useState<boolean[]>(() => heroSlides.map(() => false));
+  const readyRef = useRef(ready);
   const slideRef = useRef(slide);
   const pendingRef = useRef<number | null>(null);
-  const touchStart = useRef<{ x: number; y: number } | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const current = heroSlides[slide];
 
-  loadedRef.current = loaded;
+  readyRef.current = ready;
   slideRef.current = slide;
 
-  const markLoaded = useCallback((index: number) => {
-    setLoaded((prev) => {
+  const markReady = useCallback((index: number) => {
+    setReady((prev) => {
       if (prev[index]) return prev;
       const next = [...prev];
       next[index] = true;
@@ -40,36 +39,29 @@ export function HeroChrome() {
     });
   }, []);
 
-  const commitSlide = useCallback((target: number) => {
-    setUnderlay(slideRef.current);
-    setSlide(target);
-  }, []);
-
-  /** Never fade to a slide until its image is in cache — avoids the Vercel black gap. */
   const goTo = useCallback(
     (index: number) => {
       const target = (index + heroSlides.length) % heroSlides.length;
       if (target === slideRef.current) return;
 
-      if (loadedRef.current[target]) {
+      if (readyRef.current[target]) {
         pendingRef.current = null;
-        commitSlide(target);
+        setSlide(target);
         return;
       }
 
       pendingRef.current = target;
       const img = new window.Image();
-      img.decoding = "async";
       img.onload = () => {
-        markLoaded(target);
+        markReady(target);
         if (pendingRef.current === target) {
           pendingRef.current = null;
-          commitSlide(target);
+          setSlide(target);
         }
       };
       img.src = heroSlides[target].image;
     },
-    [commitSlide, markLoaded],
+    [markReady],
   );
 
   const go = useCallback(
@@ -79,18 +71,16 @@ export function HeroChrome() {
     [goTo],
   );
 
-  // Warm the browser cache for every slide (localhost is fast; Vercel needs this).
   useEffect(() => {
     heroSlides.forEach((item, i) => {
       const img = new window.Image();
-      img.decoding = "async";
-      img.onload = () => markLoaded(i);
+      img.onload = () => markReady(i);
+      if (img.complete) markReady(i);
       img.src = item.image;
     });
-  }, [markLoaded]);
+  }, [markReady]);
 
   useEffect(() => {
-    const desktop = window.matchMedia("(min-width: 768px)");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let id: ReturnType<typeof setInterval> | undefined;
 
@@ -99,38 +89,46 @@ export function HeroChrome() {
         clearInterval(id);
         id = undefined;
       }
-      if (desktop.matches && !reducedMotion.matches) {
+      if (!reducedMotion.matches) {
         id = setInterval(() => go(1), 6000);
       }
     }
 
     syncAutoplay();
-    desktop.addEventListener("change", syncAutoplay);
     reducedMotion.addEventListener("change", syncAutoplay);
     return () => {
       if (id) clearInterval(id);
-      desktop.removeEventListener("change", syncAutoplay);
       reducedMotion.removeEventListener("change", syncAutoplay);
     };
   }, [go]);
 
-  function onTouchStart(event: React.TouchEvent) {
-    touchStart.current = {
-      x: event.touches[0].clientX,
-      y: event.touches[0].clientY,
+  // Native touch listeners — more reliable on mobile than React synthetic events.
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    let startX = 0;
+    let startY = 0;
+
+    const onStart = (event: TouchEvent) => {
+      startX = event.touches[0].clientX;
+      startY = event.touches[0].clientY;
     };
-  }
 
-  function onTouchEnd(event: React.TouchEvent) {
-    if (!touchStart.current) return;
+    const onEnd = (event: TouchEvent) => {
+      const dx = event.changedTouches[0].clientX - startX;
+      const dy = event.changedTouches[0].clientY - startY;
+      if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy) * 1.2) return;
+      go(dx < 0 ? 1 : -1);
+    };
 
-    const dx = event.changedTouches[0].clientX - touchStart.current.x;
-    const dy = event.changedTouches[0].clientY - touchStart.current.y;
-    touchStart.current = null;
-
-    if (Math.abs(dx) < 50 || Math.abs(dx) < Math.abs(dy)) return;
-    go(dx < 0 ? 1 : -1);
-  }
+    el.addEventListener("touchstart", onStart, { passive: true });
+    el.addEventListener("touchend", onEnd, { passive: true });
+    return () => {
+      el.removeEventListener("touchstart", onStart);
+      el.removeEventListener("touchend", onEnd);
+    };
+  }, [go]);
 
   const toneClass = current.tone === "light" ? "text-white" : "text-[#111111]";
   const borderClass = current.tone === "light" ? "border-white" : "border-[#111111]";
@@ -138,36 +136,24 @@ export function HeroChrome() {
 
   return (
     <section className="relative h-[calc(100svh-42px)] min-h-[560px] w-full overflow-hidden bg-[#1a1a1a] md:h-[calc(100dvh-42px)] md:min-h-[480px]">
-      <div
-        className="relative h-full w-full overflow-hidden"
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-      >
+      <div ref={containerRef} className="relative h-full w-full touch-pan-y overflow-hidden">
         {heroSlides.map((item, i) => {
           const isActive = i === slide;
-          const isUnderlay = i === underlay && i !== slide;
 
           return (
             <div
               key={item.image}
-              className={`absolute inset-0 ${
-                isActive
-                  ? "z-[2] opacity-100 transition-opacity duration-700 ease-in-out"
-                  : isUnderlay
-                    ? "z-[1] opacity-100"
-                    : "pointer-events-none z-0 opacity-0"
-              }`}
+              className={`absolute inset-0 ${isActive ? "z-[1] opacity-100" : "pointer-events-none z-0 opacity-0"}`}
               aria-hidden={!isActive}
             >
-              {/* Eager native imgs so Vercel does not lazy-skip opacity:0 slides. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={item.image}
                 alt={`${item.eyebrow} — ${item.title}`}
-                decoding="async"
+                decoding="sync"
                 loading="eager"
                 fetchPriority={i === 0 ? "high" : "low"}
-                onLoad={() => markLoaded(i)}
+                onLoad={() => markReady(i)}
                 className="hero-image absolute inset-0 h-full w-full object-cover"
                 style={
                   {
@@ -178,9 +164,7 @@ export function HeroChrome() {
               />
               {item.tone === "light" ? (
                 <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/20 to-transparent" />
-              ) : (
-                <div className="absolute inset-0 bg-gradient-to-r from-white/25 via-transparent to-transparent md:from-transparent" />
-              )}
+              ) : null}
             </div>
           );
         })}
@@ -323,7 +307,7 @@ function SlideNavButton({
       type="button"
       aria-label={direction === "left" ? "Previous slide" : "Next slide"}
       onClick={onClick}
-      className={`absolute z-20 flex h-11 w-11 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition hover:bg-black/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 max-[479px]:hidden bottom-[clamp(108px,20vh,168px)] md:bottom-auto md:top-1/2 md:-translate-y-1/2 ${edgeClass}`}
+      className={`absolute z-20 flex h-11 w-11 items-center justify-center rounded-full bg-black/35 text-white backdrop-blur-sm transition hover:bg-black/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 bottom-[clamp(108px,20vh,168px)] md:bottom-auto md:top-1/2 md:-translate-y-1/2 ${edgeClass}`}
     >
       <Chevron dir={direction} />
     </button>
